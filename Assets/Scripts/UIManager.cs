@@ -17,9 +17,9 @@ public class UIManager : MonoBehaviour
     public GameObject reminderPanel;
 
     [Header("Study Panel Elements")]
-    public Text timerText;
     public Text sessionTimeText;
     public Button pauseButton;
+    public Button continueButton;
 
     [Header("Reminder Panel Elements")]
     public Text reminderMessage;
@@ -65,12 +65,16 @@ public class UIManager : MonoBehaviour
             gameManager.OnGameStateChanged += HandleGameStateChange;
             gameManager.OnStudyTimeUpdated += UpdateTimerDisplay;
         }
-        
+
         // Set up button listeners
+        // StudyPanel界面
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
+        continueButton.onClick.AddListener(OnContinueButtonClicked);
+        // ReminderPanel界面
         confirmStartButton.onClick.AddListener(OnConfirmStartClicked);
         delayButton.onClick.AddListener(OnDelayClicked);
         cancelButton.onClick.AddListener(OnCancelClicked);
+
         saveTaskButton.onClick.AddListener(OnSaveTaskClicked);
         
         // Initialize dropdown options
@@ -156,12 +160,27 @@ public class UIManager : MonoBehaviour
         UpdateTimerDisplay(gameManager.RemainingStudyTime); // 确保面板显示时立即更新
     }
 
-    public void ShowTaskReminder()
+    public void ShowReadyToTaskReminder()
     {
         reminderPanel.SetActive(true);
-        reminderMessage.text = "It's time to start your study session!";
+        reminderMessage.text = "It's time to start your study!";
     }
-
+    
+    public void ShowTaskEndReminder()
+    {
+        reminderPanel.SetActive(true);
+        reminderMessage.text = "任务已完成！";
+        
+        // 设置确认按钮文本和事件
+        // 待处理：confirmStartButton位置未处理
+        confirmStartButton.onClick.RemoveAllListeners();
+        confirmStartButton.onClick.AddListener(OnTaskEndConfirmed);
+        
+        // 隐藏其他不需要的按钮
+        delayButton.gameObject.SetActive(false);
+        cancelButton.gameObject.SetActive(false);
+    }
+    
     private void HideAllPanels()
     {
         mainPanel.SetActive(false);
@@ -170,7 +189,7 @@ public class UIManager : MonoBehaviour
         backpackPanel.SetActive(false);
         studyPanel.SetActive(false);
         reminderPanel.SetActive(false);
-        
+
         // 隐藏音量控件
         if (volumeSlider != null) volumeSlider.gameObject.SetActive(false);
         if (volumeText != null) volumeText.gameObject.SetActive(false);
@@ -194,25 +213,48 @@ public class UIManager : MonoBehaviour
 
     public void OnPauseButtonClicked()
     {
-        CharacterController.Instance.OnPauseButton();
+        if (CharacterController.Instance != null)
+        {
+            CharacterController.Instance.OnPauseButton();
+            pauseButton.gameObject.SetActive(false);
+            continueButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("CharacterController instance is null in OnPauseButtonClicked");
+        }
+    }
+
+    public void OnContinueButtonClicked()
+    {
+        CharacterController.Instance.OnContinueButton();
+        continueButton.gameObject.SetActive(false);
+        pauseButton.gameObject.SetActive(true);
     }
 
     private void OnConfirmStartClicked()
     {
-        gameManager.ConfirmTaskStart();
         reminderPanel.SetActive(false);
+        gameManager.ConfirmTaskStart(); // 用户确认开始任务
+    }
+    
+    private void OnTaskEndConfirmed()
+    {
+        reminderPanel.SetActive(false);
+        ShowMainPanel();
     }
 
     private void OnDelayClicked()
     {
-        // Schedule reminder again in 5 minutes
         reminderPanel.SetActive(false);
-        Invoke("ShowTaskReminder", 300f);
+        // Schedule reminder again in 5 minutes
+        Invoke("ShowReadyToTaskReminder", 300f);
     }
 
     private void OnCancelClicked()
     {
         reminderPanel.SetActive(false);
+        // 待处理：任务取消，后台会有操作
     }
     
     // Volume control methods
@@ -277,11 +319,11 @@ public class UIManager : MonoBehaviour
         
         bool isDaily = frequencyDropdown.value == 1; // 0=Once, 1=Daily
         
+        // Show confirmation and return to main
+        ShowMainPanel();
+        
         // Schedule task
         gameManager.StartNewTask(startTime, endTime);
-        
-        // Show confirmation and return to main
-        // ShowMainPanel();
     }
 
     // Update display methods
@@ -289,9 +331,6 @@ public class UIManager : MonoBehaviour
     {
         if (studyPanel.activeSelf)
         {
-            TimeSpan timeSpan = TimeSpan.FromSeconds(remainingTime);
-            timerText.text = $"{timeSpan.Minutes:00}:{timeSpan.Seconds:00}";
-            
             // 计算总分钟数
             int totalMinutes = (int)gameManager.CurrentSessionTime / 60;
             // Debug.Log($"CurrentSessionTime second: {gameManager.CurrentSessionTime}");

@@ -77,6 +77,7 @@ public class CharacterController : MonoBehaviour
         if (gameManager.CurrentState == GameManager.GameState.Studying)
         {
             gameManager.SetGameState(GameManager.GameState.Resting);
+            Debug.Log($"OnPauseButton: Studying -> Resting");
         }
     }
 
@@ -86,6 +87,7 @@ public class CharacterController : MonoBehaviour
         if (gameManager.CurrentState == GameManager.GameState.Resting)
         {
             gameManager.SetGameState(GameManager.GameState.Studying);
+            Debug.Log($"OnContinueButton: Resting -> Studying");
         }
     }
 
@@ -96,6 +98,7 @@ public class CharacterController : MonoBehaviour
         if (gameManager.CurrentState == GameManager.GameState.Resting)
         {
             gameManager.SetGameState(GameManager.GameState.Studying);
+            Debug.Log($"OnRestAnimationComplete: Resting -> Studying");
         }
     }
 }
