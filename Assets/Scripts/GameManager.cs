@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using UnityEngine.SceneManagement; // 添加场景管理命名空间
 
 public class GameManager : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            InitializeGame();
         }
         else
         {
@@ -38,13 +40,24 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        InitializeGame();
+        // 确保在Home场景
+        if (SceneManager.GetActiveScene().name != "Home")
+        {
+            SceneManager.LoadScene("Home");
+        }
     }
+
+    private bool isInitialized = false;
 
     private void InitializeGame()
     {
+        if (isInitialized) return;
+        
+        Debug.Log("初始化游戏");
         SetGameState(GameState.Idle);
         remainingStudyTime = studyDuration * 60; // Convert to seconds
+        
+        isInitialized = true;
     }
 
     public void SetGameState(GameState newState)
@@ -52,23 +65,50 @@ public class GameManager : MonoBehaviour
         Debug.Log($"SetGameState: {currentState} -> {newState}");
         if (currentState == newState) return;
 
-        currentState = newState;
-        OnGameStateChanged?.Invoke(newState);
-
-        switch (newState)
+        // 处理场景切换
+        if (newState == GameState.Studying && currentState != GameState.Studying)
         {
-            case GameState.Idle:
-                Debug.Log("进入空闲状态");
-                // 待处理：这里需要添加弹窗
-                break;
-            case GameState.Studying:
-                Debug.Log("开始学习会话");
-                StartCoroutine(StudySession());
-                break;
-            case GameState.Resting:
-                Debug.Log("开始休息会话");
-                StartCoroutine(RestSession());
-                break;
+            // 进入学习状态时切换到Studying场景
+            SceneManager.LoadScene("Studying");
+        }
+        else if (newState == GameState.Idle && currentState == GameState.Studying)
+        {
+            // 退出学习状态时返回Home场景
+            SceneManager.LoadScene("Home");
+        }
+
+        // 保存旧状态
+        GameState previousState = currentState;
+        currentState = newState;
+        
+        // 只在状态真正改变时触发事件
+        if (previousState != newState)
+        {
+            OnGameStateChanged?.Invoke(newState);
+        }
+
+        // 避免在Idle状态重复触发
+        if (newState != GameState.Idle)
+        {
+            switch (newState)
+            {
+                case GameState.Studying:
+                    // 确保不在同一个状态下重复启动协程
+                    if (previousState != GameState.Studying)
+                    {
+                        Debug.Log("开始学习会话");
+                        StartCoroutine(StudySession());
+                    }
+                    break;
+                case GameState.Resting:
+                    // 确保不在同一个状态下重复启动协程
+                    if (previousState != GameState.Resting)
+                    {
+                        Debug.Log("开始休息会话");
+                        StartCoroutine(RestSession());
+                    }
+                    break;
+            }
         }
     }
 
