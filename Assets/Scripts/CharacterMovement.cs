@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems; // For UI detection
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -29,9 +30,17 @@ public class CharacterMovement : MonoBehaviour
     
     private void HandleInput()
     {
+        // Skip input handling if pointer is over UI
+        if (IsPointerOverUI())
+        {
+            Debug.Log("Input blocked by UI element");
+            return;
+        }
+        
         // Handle mouse input
         if (Input.GetMouseButtonDown(0))
         {
+            Debug.Log("Mouse input detected - not over UI");
             SetTargetPosition(Input.mousePosition);
         }
         
@@ -41,17 +50,54 @@ public class CharacterMovement : MonoBehaviour
             Touch touch = Input.GetTouch(0);
             if (touch.phase == TouchPhase.Began)
             {
+                Debug.Log("Touch input detected - not over UI");
                 SetTargetPosition(touch.position);
             }
         }
     }
     
+    // More robust UI detection that works with all input types
+    private bool IsPointerOverUI()
+    {
+        // Check if EventSystem exists
+        if (EventSystem.current == null)
+        {
+            Debug.LogError("EventSystem is missing in the scene!");
+            return false;
+        }
+        
+        // Check for mouse over UI
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            Debug.Log("Mouse pointer over UI element");
+            return true;
+        }
+        
+        // Additional check for touch input
+        if (Input.touchCount > 0)
+        {
+            for (int i = 0; i < Input.touchCount; i++)
+            {
+                if (EventSystem.current.IsPointerOverGameObject(Input.GetTouch(i).fingerId))
+                {
+                    Debug.Log($"Touch {i} over UI element (finger ID: {Input.GetTouch(i).fingerId})");
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
+
     private void SetTargetPosition(Vector3 screenPosition)
     {
         // Convert screen position to world position
         Vector3 worldPosition = Camera.main.ScreenToWorldPoint(screenPosition);
         targetPosition = new Vector2(worldPosition.x, worldPosition.y);
         isMoving = true;
+        
+        // Debug log to verify input handling
+        Debug.Log($"Set target position: {worldPosition}");
     }
     
     private void MoveCharacter()
@@ -189,7 +235,7 @@ public class CharacterMovement : MonoBehaviour
         if (animator != null)
         {
             // Try playing the animation with layer index -1 (base layer) and normalized time 0
-            Debug.Log($"PlayAnimation: {animationName}");
+            // Debug.Log($"PlayAnimation: {animationName}");
             animator.Play(animationName, -1, 0f);
         }
     }

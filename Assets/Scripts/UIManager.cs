@@ -1,11 +1,39 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System;
 using Unity.VisualScripting;
 using UnityEngine.PlayerLoop;
 
 public class UIManager : MonoBehaviour
 {
+//     private void OnEnable()
+//     {
+//         // Subscribe to scene loaded event
+//         if (GameManager.Instance != null)
+//         {
+//             GameManager.Instance.OnSceneLoaded += InitializeUI;
+//         }
+//     }
+    
+//     private void OnDisable()
+//     {
+//         // Unsubscribe from scene loaded event
+//         if (GameManager.Instance != null)
+//         {
+//             GameManager.Instance.OnSceneLoaded -= InitializeUI;
+//         }
+//     }
+    
+//     private void InitializeUI()
+//     {
+//         // Reinitialize UI elements when scene changes
+//         Debug.Log("Initializing UI for current scene");
+        
+//         // Add your UI initialization code here
+//         // This will be called every time a new scene is loaded
+//     }
+    
     public static UIManager Instance { get; private set; }
 
     [Header("UI Panels")]
@@ -13,13 +41,7 @@ public class UIManager : MonoBehaviour
     public GameObject settingsPanel;
     public GameObject taskPanel;
     public GameObject backpackPanel;
-    public GameObject studyPanel;
     public GameObject reminderPanel;
-
-    [Header("Study Panel Elements")]
-    public Text sessionTimeText;
-    public Button pauseButton;
-    public Button continueButton;
 
     [Header("Reminder Panel Elements")]
     public Text reminderMessage;
@@ -63,13 +85,8 @@ public class UIManager : MonoBehaviour
         if (gameManager != null)
         {
             gameManager.OnGameStateChanged += HandleGameStateChange;
-            gameManager.OnStudyTimeUpdated += UpdateTimerDisplay;
         }
 
-        // Set up button listeners
-        // StudyPanel界面
-        pauseButton.onClick.AddListener(OnPauseButtonClicked);
-        continueButton.onClick.AddListener(OnContinueButtonClicked);
         // ReminderPanel界面
         confirmStartButton.onClick.AddListener(OnConfirmStartClicked);
         delayButton.onClick.AddListener(OnDelayClicked);
@@ -95,19 +112,9 @@ public class UIManager : MonoBehaviour
         if (gameManager != null)
         {
             gameManager.OnGameStateChanged -= HandleGameStateChange;
-            gameManager.OnStudyTimeUpdated -= UpdateTimerDisplay;
         }
     }
     
-    private void Update()
-    {
-        // 实时更新会话时间显示
-        if (studyPanel.activeSelf)
-        {
-            UpdateTimerDisplay(gameManager.RemainingStudyTime);
-        }
-    }
-
     private void HandleGameStateChange(GameManager.GameState newState)
     {
         switch (newState)
@@ -116,10 +123,11 @@ public class UIManager : MonoBehaviour
                 ShowMainPanel();
                 break;
             case GameManager.GameState.Studying:
-                ShowStudyPanel();
+                // Study Panel is now handled in the Studying scene
+                SceneManager.LoadScene("Studying");
                 break;
             case GameManager.GameState.Resting:
-                // Keep study panel visible during rest
+                // Resting state handled in Study scene
                 break;
         }
     }
@@ -153,13 +161,6 @@ public class UIManager : MonoBehaviour
         backpackPanel.SetActive(true);
     }
 
-    public void ShowStudyPanel()
-    {
-        HideAllPanels();
-        studyPanel.SetActive(true);
-        UpdateTimerDisplay(gameManager.RemainingStudyTime); // 确保面板显示时立即更新
-    }
-
     public void ShowReadyToTaskReminder()
     {
         reminderPanel.SetActive(true);
@@ -187,7 +188,6 @@ public class UIManager : MonoBehaviour
         settingsPanel.SetActive(false);
         taskPanel.SetActive(false);
         backpackPanel.SetActive(false);
-        studyPanel.SetActive(false);
         reminderPanel.SetActive(false);
 
         // 隐藏音量控件
@@ -209,27 +209,6 @@ public class UIManager : MonoBehaviour
     public void OnBackpackButtonClicked()
     {
         ShowBackpackPanel();
-    }
-
-    public void OnPauseButtonClicked()
-    {
-        if (CharacterController.Instance != null)
-        {
-            CharacterController.Instance.OnPauseButton();
-            pauseButton.gameObject.SetActive(false);
-            continueButton.gameObject.SetActive(true);
-        }
-        else
-        {
-            Debug.LogError("CharacterController instance is null in OnPauseButtonClicked");
-        }
-    }
-
-    public void OnContinueButtonClicked()
-    {
-        CharacterController.Instance.OnContinueButton();
-        continueButton.gameObject.SetActive(false);
-        pauseButton.gameObject.SetActive(true);
     }
 
     private void OnConfirmStartClicked()
@@ -324,17 +303,5 @@ public class UIManager : MonoBehaviour
         
         // Schedule task
         gameManager.StartNewTask(startTime, endTime);
-    }
-
-    // Update display methods
-    private void UpdateTimerDisplay(float remainingTime)
-    {
-        if (studyPanel.activeSelf)
-        {
-            // 计算总分钟数
-            int totalMinutes = (int)gameManager.CurrentSessionTime / 60;
-            // Debug.Log($"CurrentSessionTime second: {gameManager.CurrentSessionTime}");
-            sessionTimeText.text = $"Session: {totalMinutes} min";
-        }
     }
 }

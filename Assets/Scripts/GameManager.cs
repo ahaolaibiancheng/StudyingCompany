@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement; // 添加场景管理命名空间
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
+    
+    // Scene-loaded event for UI initialization
+    public event Action OnSceneLoaded;
 
     // Game states
     public enum GameState { Idle, Studying, Resting }
@@ -31,11 +34,26 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             InitializeGame();
+            
+            // Subscribe to scene change events
+            SceneManager.sceneLoaded += OnSceneLoadedHandler;
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+    
+    private void OnSceneLoadedHandler(Scene scene, LoadSceneMode mode)
+    {
+        // Notify subscribers that a new scene is loaded
+        OnSceneLoaded?.Invoke();
+    }
+    
+    private void OnDestroy()
+    {
+        // Unsubscribe from scene change events
+        SceneManager.sceneLoaded -= OnSceneLoadedHandler;
     }
 
     private void Start()
