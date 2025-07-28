@@ -2,11 +2,12 @@ using UnityEngine;
 using System.Collections;
 using System;
 using UnityEngine.SceneManagement; // 添加场景管理命名空间
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    
+
     // Scene-loaded event for UI initialization
     public event Action OnSceneLoaded;
 
@@ -34,7 +35,7 @@ public class GameManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             InitializeGame();
-            
+
             // Subscribe to scene change events
             SceneManager.sceneLoaded += OnSceneLoadedHandler;
         }
@@ -43,13 +44,13 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     private void OnSceneLoadedHandler(Scene scene, LoadSceneMode mode)
     {
         // Notify subscribers that a new scene is loaded
         OnSceneLoaded?.Invoke();
     }
-    
+
     private void OnDestroy()
     {
         // Unsubscribe from scene change events
@@ -63,6 +64,11 @@ public class GameManager : MonoBehaviour
         {
             SceneManager.LoadScene("Home");
         }
+
+        // todo
+        UIManager.Instance.OpenPanel(UIConst.MainPanel);
+        // print(GetPackageLocalData().Count);
+        // print(GetPackageTable().DataList.Count);
     }
 
     private bool isInitialized = false;
@@ -70,11 +76,11 @@ public class GameManager : MonoBehaviour
     private void InitializeGame()
     {
         if (isInitialized) return;
-        
+
         Debug.Log("初始化游戏");
         SetGameState(GameState.Idle);
         remainingStudyTime = studyDuration * 60; // Convert to seconds
-        
+
         isInitialized = true;
     }
 
@@ -98,7 +104,7 @@ public class GameManager : MonoBehaviour
         // 保存旧状态
         GameState previousState = currentState;
         currentState = newState;
-        
+
         // 只在状态真正改变时触发事件
         if (previousState != newState)
         {
@@ -131,21 +137,21 @@ public class GameManager : MonoBehaviour
     }
 
     private Coroutine reminderCoroutine; // 存储协程引用
-    
+
     public void StartNewTask(DateTime startTime, DateTime endTime)
     {
         taskStartTime = startTime;
         taskEndTime = endTime;
         currentSessionTime = 0f; // 开始新任务时重置累计时间
         remainingStudyTime = studyDuration * 60; // 重置剩余学习时间
-        
+
         // 取消现有计时器
         CancelReminderTimer();
-        
+
         // 计算距离任务开始前5分钟的时间差（秒）
         TimeSpan timeToReminder = startTime - DateTime.Now - TimeSpan.FromMinutes(timeBeforeReminder);
         float delaySeconds = (float)timeToReminder.TotalSeconds;
-        
+
         if (delaySeconds > 0)
         {
             // 启动协程定时器
@@ -164,7 +170,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    
+
     private IEnumerator ReminderCoroutine(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -177,7 +183,7 @@ public class GameManager : MonoBehaviour
             Debug.LogError("UIManager instance is null in GameManager.ReminderCoroutine");
         }
     }
-    
+
     private void CancelReminderTimer()
     {
         if (reminderCoroutine != null)
@@ -188,18 +194,18 @@ public class GameManager : MonoBehaviour
     }
 
     private Coroutine startTaskCoroutine; // 用于存储开始任务的协程
-    
+
     public void ConfirmTaskStart()
     {
         // 取消可能正在进行的等待
         CancelStartTaskWait();
-        
+
         if (DateTime.Now >= taskEndTime)
         {
             Debug.LogWarning($"ConfirmTaskStart: 当前时间 {DateTime.Now} 晚于任务结束时间 {taskEndTime}");
             return;
         }
-        
+
         if (DateTime.Now >= taskStartTime)
         {
             // 如果已经过了开始时间，立即开始
@@ -210,18 +216,18 @@ public class GameManager : MonoBehaviour
             // 计算到任务开始时间还有多久
             TimeSpan timeToStart = taskStartTime - DateTime.Now;
             float waitSeconds = (float)timeToStart.TotalSeconds;
-            
+
             Debug.Log($"等待任务开始: 还有 {timeToStart.TotalSeconds} 秒");
             startTaskCoroutine = StartCoroutine(WaitForTaskStart(waitSeconds));
         }
     }
-    
+
     private IEnumerator WaitForTaskStart(float delay)
     {
         yield return new WaitForSeconds(delay);
         SetGameState(GameState.Studying);
     }
-    
+
     private void CancelStartTaskWait()
     {
         if (startTaskCoroutine != null)
@@ -230,7 +236,7 @@ public class GameManager : MonoBehaviour
             startTaskCoroutine = null;
         }
     }
-    
+
     public void CancelTask()
     {
         CancelStartTaskWait();
@@ -241,7 +247,7 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("StudySession 开始");
         isStudyPaused = false;
-        
+
         // 不再重置 currentSessionTime，而是持续累加
         while (currentState == GameState.Studying)
         {
@@ -249,7 +255,7 @@ public class GameManager : MonoBehaviour
             {
                 currentSessionTime += Time.deltaTime;
                 remainingStudyTime -= Time.deltaTime;
-                
+
                 // Debug.Log($"更新学习时间: session={currentSessionTime}, remaining={remainingStudyTime}");
                 OnStudyTimeUpdated?.Invoke(remainingStudyTime);
 
@@ -308,13 +314,13 @@ public class GameManager : MonoBehaviour
         // Reward player with random item
         // InventorySystem.Instance.AddRandomItem();
         SetGameState(GameState.Idle);
-        
+
         // 完成任务时重置累计时间
         currentSessionTime = 0f;
-        
+
         // 取消提醒计时器
         CancelReminderTimer();
-        
+
         // 显示任务结束提醒
         if (UIManager.Instance != null)
         {
@@ -330,4 +336,79 @@ public class GameManager : MonoBehaviour
     public GameState CurrentState => currentState;
     public float RemainingStudyTime => remainingStudyTime;
     public float CurrentSessionTime => currentSessionTime;
+
+
+
+    private PackageTable packageTable;
+
+    public PackageTable GetPackageTable()
+    {
+        if (packageTable == null)
+        {
+            packageTable = Resources.Load<PackageTable>("TableData/PackageTable");
+        }
+        return packageTable;
+    }
+
+    public List<PackageLocalItem> GetPackageLocalData()
+    {
+        return PackageLocalData.Instance.LoadPackage();
+    }
+
+    public PackageTableItem GetPackageItemById(int id)
+    {
+        List<PackageTableItem> packageDataList = GetPackageTable().DataList;
+        foreach (PackageTableItem item in packageDataList)
+        {
+            if (item.id == id)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    public PackageLocalItem GetPackageLocalItemByUId(string uid)
+    {
+        List<PackageLocalItem> packageDataList = GetPackageLocalData();
+        foreach (PackageLocalItem item in packageDataList)
+        {
+            if (item.uid == uid)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+    
+    public List<PackageLocalItem> GetSortPackageLocalData()
+    {
+        List<PackageLocalItem> localItems = PackageLocalData.Instance.LoadPackage();
+        localItems.Sort(new PackageItemComparer());
+        return localItems;
+    }
+}
+
+public class PackageItemComparer : IComparer<PackageLocalItem>
+{
+    public int Compare(PackageLocalItem a, PackageLocalItem b)
+    {
+        PackageTableItem x = GameManager.Instance.GetPackageItemById(a.id);
+        PackageTableItem y = GameManager.Instance.GetPackageItemById(b.id);
+        // 首先按star从大到小排序
+        int starComparison = y.star.CompareTo(x.star);
+
+        // 如果star相同，则按id从大到小排序
+        if (starComparison == 0)
+        {
+            int idComparison = y.id.CompareTo(x.id);
+            if (idComparison == 0)
+            {
+                return b.level.CompareTo(a.level);
+            }
+            return idComparison;
+        }
+
+        return starComparison;
+    }
 }
