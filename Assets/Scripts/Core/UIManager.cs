@@ -9,106 +9,32 @@ using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
-    //     private void OnEnable()
-    //     {
-    //         // Subscribe to scene loaded event
-    //         if (GameManager.Instance != null)
-    //         {
-    //             GameManager.Instance.OnSceneLoaded += InitializeUI;
-    //         }
-    //     }
-
-    //     private void OnDisable()
-    //     {
-    //         // Unsubscribe from scene loaded event
-    //         if (GameManager.Instance != null)
-    //         {
-    //             GameManager.Instance.OnSceneLoaded -= InitializeUI;
-    //         }
-    //     }
-
-    //     private void InitializeUI()
-    //     {
-    //         // Reinitialize UI elements when scene changes
-    //         Debug.Log("Initializing UI for current scene");
-
-    //         // Add your UI initialization code here
-    //         // This will be called every time a new scene is loaded
-    //     }
-
-    // public static UIManager Instance { get; private set; }
-
-    [Header("UI Panels")]
-    public GameObject mainPanel;
-    public GameObject settingsPanel;
-    public GameObject taskPanel;
-    public GameObject backpackPanel;
-    public GameObject reminderPanel;
-
-    [Header("Reminder Panel Elements")]
-    public Text reminderMessage;
-    public Button confirmStartButton;
-    public Button delayButton;
-    public Button cancelButton;
-
-    [Header("Task Panel Elements")]
-    public InputField taskNameInput;
-    public InputField startTimeInput;
-    public InputField endTimeInput;
-    public Dropdown frequencyDropdown;
-    public Button saveTaskButton;
-
-    // Volume control elements
-    public Slider volumeSlider;
-    public Text volumeText;
-
-    private GameManager gameManager;
-
-    // private void Awake()
-    // {
-    //     if (Instance == null)
-    //     {
-    //         Instance = this;
-    //     }
-    //     else
-    //     {
-    //         Destroy(gameObject);
-    //     }
-    // }
-
-    private void Start()
+    private void OnEnable()
     {
-        gameManager = GameManager.Instance;
-
-        // Initialize UI
-        ShowMainPanel();
-
-        // Register events
-        if (gameManager != null)
+        // Subscribe to scene loaded event
+        if (GameManager.Instance != null)
         {
-            gameManager.OnGameStateChanged += HandleGameStateChange;
-        }
-
-        // ReminderPanel界面
-        confirmStartButton.onClick.AddListener(OnConfirmStartClicked);
-        delayButton.onClick.AddListener(OnDelayClicked);
-        cancelButton.onClick.AddListener(OnCancelClicked);
-
-        saveTaskButton.onClick.AddListener(OnSaveTaskClicked);
-
-        // Initialize dropdown options
-        frequencyDropdown.ClearOptions();
-        frequencyDropdown.AddOptions(new System.Collections.Generic.List<string> { "Once", "Daily" });
-
-        // Initialize volume settings
-        LoadVolumeSettings();
-        if (volumeSlider != null)
-        {
-            volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
-            UpdateVolumeText(volumeSlider.value);
+            GameManager.Instance.OnSceneLoaded += InitializeUI;
         }
     }
 
+    private void OnDisable()
+    {
+        // Unsubscribe from scene loaded event
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnSceneLoaded -= InitializeUI;
+        }
+    }
+
+    private void InitializeUI()
+    {
+        // Reinitialize UI elements when scene changes
+        Debug.Log("Initializing UI for current scene");
+
+        // Add your UI initialization code here
+        // This will be called every time a new scene is loaded
+    }
     private void OnDestroy()
     {
         if (gameManager != null)
@@ -122,7 +48,6 @@ public class UIManager : MonoBehaviour
         switch (newState)
         {
             case GameManager.GameState.Idle:
-                ShowMainPanel();
                 break;
             case GameManager.GameState.Studying:
                 // Study Panel is now handled in the Studying scene
@@ -133,182 +58,6 @@ public class UIManager : MonoBehaviour
                 break;
         }
     }
-
-    // Panel management
-    public void ShowMainPanel()
-    {
-        HideAllPanels();
-        mainPanel.SetActive(true);
-    }
-
-    public void ShowSettingsPanel()
-    {
-        HideAllPanels();
-        settingsPanel.SetActive(true);
-
-        // 确保音量控件可见
-        if (volumeSlider != null) volumeSlider.gameObject.SetActive(true);
-        if (volumeText != null) volumeText.gameObject.SetActive(true);
-    }
-
-    public void ShowTaskPanel()
-    {
-        HideAllPanels();
-        taskPanel.SetActive(true);
-    }
-
-    public void ShowBackpackPanel()
-    {
-        HideAllPanels();
-        backpackPanel.SetActive(true);
-    }
-
-    public void ShowReadyToTaskReminder()
-    {
-        reminderPanel.SetActive(true);
-        reminderMessage.text = "It's time to start your study!";
-    }
-
-    public void ShowTaskEndReminder()
-    {
-        reminderPanel.SetActive(true);
-        reminderMessage.text = "任务已完成！";
-
-        // 设置确认按钮文本和事件
-        // 待处理：confirmStartButton位置未处理
-        confirmStartButton.onClick.RemoveAllListeners();
-        confirmStartButton.onClick.AddListener(OnTaskEndConfirmed);
-
-        // 隐藏其他不需要的按钮
-        delayButton.gameObject.SetActive(false);
-        cancelButton.gameObject.SetActive(false);
-    }
-
-    private void HideAllPanels()
-    {
-        mainPanel.SetActive(false);
-        settingsPanel.SetActive(false);
-        taskPanel.SetActive(false);
-        backpackPanel.SetActive(false);
-        reminderPanel.SetActive(false);
-
-        // 隐藏音量控件
-        if (volumeSlider != null) volumeSlider.gameObject.SetActive(false);
-        if (volumeText != null) volumeText.gameObject.SetActive(false);
-    }
-
-    // Button click handlers
-    public void OnSettingsButtonClicked()
-    {
-        ShowSettingsPanel();
-    }
-
-    public void OnTaskButtonClicked()
-    {
-        ShowTaskPanel();
-    }
-
-    public void OnBackpackButtonClicked()
-    {
-        ShowBackpackPanel();
-    }
-
-    private void OnConfirmStartClicked()
-    {
-        reminderPanel.SetActive(false);
-        gameManager.ConfirmTaskStart(); // 用户确认开始任务
-    }
-
-    private void OnTaskEndConfirmed()
-    {
-        reminderPanel.SetActive(false);
-        ShowMainPanel();
-    }
-
-    private void OnDelayClicked()
-    {
-        reminderPanel.SetActive(false);
-        // Schedule reminder again in 5 minutes
-        Invoke("ShowReadyToTaskReminder", 300f);
-    }
-
-    private void OnCancelClicked()
-    {
-        reminderPanel.SetActive(false);
-        // 待处理：任务取消，后台会有操作
-    }
-
-    // Volume control methods
-    private void OnVolumeChanged(float value)
-    {
-        AudioListener.volume = value;
-        UpdateVolumeText(value);
-        SaveVolumeSettings();
-    }
-
-    private void UpdateVolumeText(float value)
-    {
-        if (volumeText != null)
-        {
-            volumeText.text = $"Volume: {Mathf.RoundToInt(value * 100)}%";
-        }
-    }
-
-    private void SaveVolumeSettings()
-    {
-        PlayerPrefs.SetFloat("SystemVolume", volumeSlider.value);
-        PlayerPrefs.Save();
-    }
-
-    private void LoadVolumeSettings()
-    {
-        if (PlayerPrefs.HasKey("SystemVolume"))
-        {
-            float volume = PlayerPrefs.GetFloat("SystemVolume");
-            AudioListener.volume = volume;
-            if (volumeSlider != null)
-            {
-                volumeSlider.value = volume;
-            }
-        }
-        else
-        {
-            // Default volume
-            AudioListener.volume = 0.8f;
-            if (volumeSlider != null)
-            {
-                volumeSlider.value = 0.8f;
-            }
-        }
-    }
-
-    private void OnSaveTaskClicked()
-    {
-        // Parse task details with exact format validation
-        DateTime startTime, endTime;
-        string format = "HH:mm"; // 24-hour format like "14:30"
-        bool isValidStart = DateTime.TryParseExact(startTimeInput.text, format, null, System.Globalization.DateTimeStyles.None, out startTime);
-        bool isValidEnd = DateTime.TryParseExact(endTimeInput.text, format, null, System.Globalization.DateTimeStyles.None, out endTime);
-
-        if (!isValidStart || !isValidEnd)
-        {
-            // Show detailed error message
-            reminderPanel.SetActive(true);
-            reminderMessage.text = "Invalid time format! Please use 24-hour format (e.g. 14:30).";
-            return;
-        }
-
-        bool isDaily = frequencyDropdown.value == 1; // 0=Once, 1=Daily
-
-        // Show confirmation and return to main
-        ShowMainPanel();
-
-        // Schedule task
-        gameManager.StartNewTask(startTime, endTime);
-    }
-
-//-----------------------------------------------------------------------------------------
-
     private static UIManager _instance;
     private Transform _uiRoot;
     // 路径配置字典
@@ -317,6 +66,7 @@ public class UIManager : MonoBehaviour
     private Dictionary<string, GameObject> prefabDict;
     // 已打开界面的缓存字典
     public Dictionary<string, BasePanel> panelDict;
+    private GameManager gameManager;
     
     public static UIManager Instance
     {
@@ -324,10 +74,43 @@ public class UIManager : MonoBehaviour
         {
             if (_instance == null)
             {
-                _instance = new UIManager();
+                _instance = FindObjectOfType<UIManager>();
+                
+                if (_instance == null)
+                {
+                    GameObject uiManagerObject = new GameObject("UIManager");
+                    _instance = uiManagerObject.AddComponent<UIManager>();
+                }
             }
             return _instance;
         }
+    }
+
+    private void Awake()
+    {
+        if (_instance == null)
+        {
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (_instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+    
+    private void Start()
+    {
+        InitDicts();    // 不能在Awake里初始化
+
+        gameManager = GameManager.Instance;
+
+        // Register events
+        if (gameManager != null)
+        {
+            gameManager.OnGameStateChanged += HandleGameStateChange;
+        }
+
     }
 
     public Transform UIRoot
@@ -336,22 +119,18 @@ public class UIManager : MonoBehaviour
         {
             if (_uiRoot == null)
             {
-                if (GameObject.Find("Canvas"))
+                if (GameObject.Find("PanelCanvas"))
                 {
-                    _uiRoot = GameObject.Find("Canvas").transform;
+                    _uiRoot = GameObject.Find("PanelCanvas").transform;
                 }
                 else
                 {
-                    _uiRoot = new GameObject("Canvas").transform;
+                    _uiRoot = new GameObject("PanelCanvas").transform;
                 }
-            };
+            }
+            ;
             return _uiRoot;
         }
-    }
-
-    private UIManager()
-    {
-        InitDicts();
     }
 
     private void InitDicts()
@@ -361,9 +140,12 @@ public class UIManager : MonoBehaviour
 
         pathDict = new Dictionary<string, string>()
         {
-            {UIConst.PackagePanel, "Package/PackagePanel"},
+            {UIConst.MainPanel, "Main/MainPanel"},
+            {UIConst.MenuPanel, "MenuPanel"},
+            {UIConst.TaskPanel, "TaskPanel"},
+            {UIConst.ReminderPanel, "ReminderPanel"},
+            {UIConst.PackagePanel, "PackagePanel"},
             // {UIConst.LotteryPanel, "Lottery/LotteryPanel"},
-            // {UIConst.MainPanel, "MainPanel"},
         };
     }
 
@@ -403,12 +185,36 @@ public class UIManager : MonoBehaviour
             string realPath = "Prefab/Panel/" + path;
 
             panelPrefab = Resources.Load<GameObject>(realPath) as GameObject;
+            if (panelPrefab == null)
+            {
+                Debug.LogError($"无法加载预制体: {realPath}，请检查路径是否正确");
+                return null;
+            }
             prefabDict.Add(name, panelPrefab);
         }
 
-        // 打开界面
+        // 检查UIRoot是否存在
+        if (UIRoot == null)
+        {
+            Debug.LogError("UIRoot为空，无法找到PanelCanvas对象");
+            return null;
+        }
+
+        // 打开界面，挂载在UIRoot下
         GameObject panelObject = GameObject.Instantiate(panelPrefab, UIRoot, false);
+        if (panelObject == null)
+        {
+            Debug.LogError($"实例化预制体失败: {name}");
+            return null;
+        }
+        
         panel = panelObject.GetComponent<BasePanel>();
+        if (panel == null)
+        {
+            Debug.LogError($"预制体 {name} 缺少 BasePanel 组件");
+            Destroy(panelObject); // 销毁已创建的对象
+            return null;
+        }
         panelDict.Add(name, panel);
         panel.OpenPanel(name);
         return panel;
@@ -424,7 +230,6 @@ public class UIManager : MonoBehaviour
         }
 
         panel.ClosePanel();
-        // panelDict.Remove(name);
         return true;
     }
 
@@ -432,10 +237,11 @@ public class UIManager : MonoBehaviour
 
 public class UIConst
 {
-    // menu panels
-
+    public const string MainPanel = "MainPanel";
+    public const string MenuPanel = "MenuPanel";
+    public const string TaskPanel = "TaskPanel";
+    public const string ReminderPanel = "ReminderPanel";
     public const string PackagePanel = "PackagePanel";
     // public const string LotteryPanel = "LotteryPanel";
-    public const string MainPanel = "MainPanel";
 }
 

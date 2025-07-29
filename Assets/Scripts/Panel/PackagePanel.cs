@@ -37,19 +37,19 @@ public class PackagePanel : BasePanel
     // public PackageMode curMode = PackageMode.normal;
     // public List<string> deleteChooseUid;
 
-    // private string _chooseUid;
-    // public string chooseUID
-    // {
-    //     get
-    //     {
-    //         return _chooseUid;
-    //     }
-    //     set
-    //     {
-    //         _chooseUid = value;
-    //         RefreshDetail();
-    //     }
-    // }
+    private string _chooseUid;
+    public string chooseUID
+    {
+        get
+        {
+            return _chooseUid;
+        }
+        set
+        {
+            _chooseUid = value;
+            RefreshDetail();    // 赋予新值，刷新物品介绍
+        }
+    }
 
     // // 添加删除选中项
     // public void AddChooseDeleteUid(string uid)
@@ -98,13 +98,13 @@ public class PackagePanel : BasePanel
         RefreshScroll();
     }
 
-    // private void RefreshDetail()
-    // {
-    //     // 找到uid对应的动态数据
-    //     PackageLocalItem localItem = GameManager.Instance.GetPackageLocalItemByUId(chooseUID);
-    //     // 刷新详情界面
-    //     UIDetailPanel.GetComponent<PackageDetail>().Refresh(localItem, this);
-    // }
+    private void RefreshDetail()
+    {
+        // 找到uid对应的动态数据
+        PackageLocalItem localItem = GameManager.Instance.GetPackageLocalItemByUId(chooseUID);
+        // 刷新详情界面
+        UIDetailPanel.GetComponent<PackageDetail>().Refresh(localItem, this);
+    }
 
     private void RefreshScroll()
     {

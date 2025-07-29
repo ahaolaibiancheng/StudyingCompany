@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class PackageCell : MonoBehaviour// , IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class PackageCell : MonoBehaviour , IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     private Transform UIIcon;
     private Transform UIHead;
@@ -85,34 +85,34 @@ public class PackageCell : MonoBehaviour// , IPointerClickHandler, IPointerEnter
     //     }
     // }
 
-    // public void OnPointerClick(PointerEventData eventData)
-    // {
-    //     print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + this.uiParent.curMode.ToString());
-    //     Debug.Log("OnPointerClick: " + eventData.ToString());
-    //     if (this.uiParent.curMode == PackageMode.delete)
-    //     {
-    //         this.uiParent.AddChooseDeleteUid(this.packageLocalData.uid);
-    //     }
-    //     if (this.uiParent.chooseUID == this.packageLocalData.uid)
-    //         return;
-    //     // 根据点击设置最新的uid -> 进而刷新详情界面
-    //     this.uiParent.chooseUID = this.packageLocalData.uid;
-    //     UISelectAni.gameObject.SetActive(true);
-    //     UISelectAni.GetComponent<Animator>().SetTrigger("In");
-    // }
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        // print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + this.uiParent.curMode.ToString());
+        Debug.Log("OnPointerClick: " + eventData.ToString());
+        // if (this.uiParent.curMode == PackageMode.delete)
+        // {
+        //     this.uiParent.AddChooseDeleteUid(this.packageLocalData.uid);
+        // }
+        if (this.uiParent.chooseUID == this.packageLocalData.uid)
+            return;
+        // 根据点击设置最新的uid -> 进而刷新详情界面
+        this.uiParent.chooseUID = this.packageLocalData.uid;
+        // UISelectAni.gameObject.SetActive(true);
+        // UISelectAni.GetComponent<Animator>().SetTrigger("In");
+    }
 
-    // public void OnPointerEnter(PointerEventData eventData)
-    // {
-    //     Debug.Log("OnPointerEnter: " + eventData.ToString());
-    //     UIMouseOverAni.gameObject.SetActive(true);
-    //     UIMouseOverAni.GetComponent<Animator>().SetTrigger("In");
-    // }
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        Debug.Log("OnPointerEnter: " + eventData.ToString());
+        // UIMouseOverAni.gameObject.SetActive(true);
+        // UIMouseOverAni.GetComponent<Animator>().SetTrigger("In");
+    }
 
-    // public void OnPointerExit(PointerEventData eventData)
-    // {
-    //     Debug.Log("OnPointerExit: " + eventData.ToString());
-    //     UIMouseOverAni.GetComponent<Animator>().SetTrigger("Out");
-    // }
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        Debug.Log("OnPointerExit: " + eventData.ToString());
+        // UIMouseOverAni.GetComponent<Animator>().SetTrigger("Out");
+    }
 
     // public void OnSelectAniInCb()
     // {

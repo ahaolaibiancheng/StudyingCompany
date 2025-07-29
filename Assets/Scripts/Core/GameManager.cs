@@ -59,12 +59,6 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        // 确保在Home场景
-        if (SceneManager.GetActiveScene().name != "Home")
-        {
-            SceneManager.LoadScene("Home");
-        }
-
         // todo
         UIManager.Instance.OpenPanel(UIConst.MainPanel);
         // print(GetPackageLocalData().Count);
@@ -162,7 +156,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("任务开始时间不足5分钟，立即提醒");
             if (UIManager.Instance != null)
             {
-                UIManager.Instance.ShowReadyToTaskReminder();
+                // UIManager.Instance.ShowReadyToTaskReminder();
             }
             else
             {
@@ -176,7 +170,7 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(delay);
         if (UIManager.Instance != null)
         {
-            UIManager.Instance.ShowReadyToTaskReminder();
+            // UIManager.Instance.ShowReadyToTaskReminder();s
         }
         else
         {
@@ -324,7 +318,7 @@ public class GameManager : MonoBehaviour
         // 显示任务结束提醒
         if (UIManager.Instance != null)
         {
-            UIManager.Instance.ShowTaskEndReminder();
+            // UIManager.Instance.ShowTaskEndReminder();
         }
         else
         {
