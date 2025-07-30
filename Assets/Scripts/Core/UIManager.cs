@@ -9,32 +9,32 @@ using System.Collections.Generic;
 
 public class UIManager : MonoBehaviour
 {
-    private void OnEnable()
-    {
-        // Subscribe to scene loaded event
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnSceneLoaded += InitializeUI;
-        }
-    }
+    // private void OnEnable()
+    // {
+    //     // Subscribe to scene loaded event
+    //     if (GameManager.Instance != null)
+    //     {
+    //         GameManager.Instance.OnSceneLoaded += InitializeUI;
+    //     }
+    // }
 
-    private void OnDisable()
-    {
-        // Unsubscribe from scene loaded event
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.OnSceneLoaded -= InitializeUI;
-        }
-    }
+    // private void OnDisable()
+    // {
+    //     // Unsubscribe from scene loaded event
+    //     if (GameManager.Instance != null)
+    //     {
+    //         GameManager.Instance.OnSceneLoaded -= InitializeUI;
+    //     }
+    // }
 
-    private void InitializeUI()
-    {
-        // Reinitialize UI elements when scene changes
-        Debug.Log("Initializing UI for current scene");
+    // private void InitializeUI()
+    // {
+    //     // Reinitialize UI elements when scene changes
+    //     Debug.Log("Initializing UI for current scene");
 
-        // Add your UI initialization code here
-        // This will be called every time a new scene is loaded
-    }
+    //     // Add your UI initialization code here
+    //     // This will be called every time a new scene is loaded
+    // }
     private void OnDestroy()
     {
         if (gameManager != null)
@@ -91,6 +91,7 @@ public class UIManager : MonoBehaviour
         if (_instance == null)
         {
             _instance = this;
+            InitDicts();
             DontDestroyOnLoad(gameObject);
         }
         else if (_instance != this)
@@ -101,7 +102,7 @@ public class UIManager : MonoBehaviour
     
     private void Start()
     {
-        InitDicts();    // 不能在Awake里初始化
+        // InitDicts();    // 不能在Awake里初始化
 
         gameManager = GameManager.Instance;
 

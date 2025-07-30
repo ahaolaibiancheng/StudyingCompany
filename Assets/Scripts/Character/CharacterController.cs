@@ -6,6 +6,8 @@ public class CharacterController : MonoBehaviour
 
     private Animator animator;
     private GameManager gameManager;
+    private TaskPanel taskPanel;
+    private TaskSystem taskSystem;
 
     // Animation parameters
     private const string IDLE_PARAM = "IsIdle";
@@ -25,6 +27,7 @@ public class CharacterController : MonoBehaviour
 
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
+        taskSystem = TaskSystem.Instance;
 
         if (gameManager != null)
         {
@@ -65,16 +68,16 @@ public class CharacterController : MonoBehaviour
     // Called when user clicks "Start Studying" button
     public void OnStartStudyButton()
     {
-        if (gameManager.CurrentState == GameManager.GameState.Idle)
+        if (gameManager.currentState == GameManager.GameState.Idle)
         {
-            gameManager.ConfirmTaskStart();
+            taskSystem.ConfirmTaskStart();
         }
     }
 
     // Called when user clicks "Pause" button during study
     public void OnPauseButton()
     {
-        if (gameManager.CurrentState == GameManager.GameState.Studying)
+        if (gameManager.currentState == GameManager.GameState.Studying)
         {
             gameManager.SetGameState(GameManager.GameState.Resting);
             Debug.Log($"OnPauseButton: Studying -> Resting");
@@ -84,7 +87,7 @@ public class CharacterController : MonoBehaviour
     // Called when user clicks "Continue" button during rest
     public void OnContinueButton()
     {
-        if (gameManager.CurrentState == GameManager.GameState.Resting)
+        if (gameManager.currentState == GameManager.GameState.Resting)
         {
             gameManager.SetGameState(GameManager.GameState.Studying);
             Debug.Log($"OnContinueButton: Resting -> Studying");
@@ -95,7 +98,7 @@ public class CharacterController : MonoBehaviour
     public void OnRestAnimationComplete()
     {
         // Only trigger if still in resting state
-        if (gameManager.CurrentState == GameManager.GameState.Resting)
+        if (gameManager.currentState == GameManager.GameState.Resting)
         {
             gameManager.SetGameState(GameManager.GameState.Studying);
             Debug.Log($"OnRestAnimationComplete: Resting -> Studying");

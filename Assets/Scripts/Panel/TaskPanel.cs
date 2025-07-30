@@ -6,12 +6,17 @@ using UnityEngine.UI;
 
 public class TaskPanel : BasePanel
 {
-    public InputField taskNameInput;
     public InputField startTimeInput;
     public InputField endTimeInput;
     public Dropdown frequencyDropdown;
+    public InputField taskNameInput;
     public Button saveTaskButton;
+    public Button closeButton;
+
     private Text reminderMessage;
+    private GameManager gameManager;
+    private TaskSystem taskSystem;
+
     protected override void Awake()
     {
         base.Awake();
@@ -20,9 +25,13 @@ public class TaskPanel : BasePanel
 
     private void InitUI()
     {
-        saveTaskButton.onClick.AddListener(OnSaveTaskClicked);
+        gameManager = GameManager.Instance;
+        taskSystem = TaskSystem.Instance;
+
         frequencyDropdown.ClearOptions();
         frequencyDropdown.AddOptions(new System.Collections.Generic.List<string> { "Once", "Daily" });
+        saveTaskButton.onClick.AddListener(OnSaveTaskClicked);
+        closeButton.onClick.AddListener(OnCloseClicked);
     }
 
     private void OnSaveTaskClicked()
@@ -43,10 +52,12 @@ public class TaskPanel : BasePanel
 
         bool isDaily = frequencyDropdown.value == 1; // 0=Once, 1=Daily
 
-        // Show confirmation and return to main
-        UIManager.Instance.OpenPanel(UIConst.MainPanel);
+        taskSystem.StartNewTask(startTime, endTime);
+    }
 
-        // Schedule task
-        GameManager.Instance.StartNewTask(startTime, endTime);
+    private void OnCloseClicked()
+    {
+        UIManager.Instance.ClosePanel(UIConst.TaskPanel);
+        UIManager.Instance.OpenPanel(UIConst.MainPanel);
     }
 }

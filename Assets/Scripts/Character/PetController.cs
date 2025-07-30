@@ -6,6 +6,7 @@ public class PetController : MonoBehaviour
 
     private Animator animator;
     private GameManager gameManager;
+    private TaskSystem taskSystem;
 
     // Animation parameters
     private const string IDLE_PARAM = "IsIdle";
@@ -27,14 +28,14 @@ public class PetController : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        
+
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
-        
+
         if (gameManager != null)
         {
             gameManager.OnGameStateChanged += HandleGameStateChange;
-            gameManager.OnStudyTimeUpdated += HandleStudyTimeUpdate;
+            taskSystem.OnStudyTimeUpdated += HandleStudyTimeUpdate;
         }
     }
 
@@ -43,7 +44,7 @@ public class PetController : MonoBehaviour
         if (gameManager != null)
         {
             gameManager.OnGameStateChanged -= HandleGameStateChange;
-            gameManager.OnStudyTimeUpdated -= HandleStudyTimeUpdate;
+            taskSystem.OnStudyTimeUpdated -= HandleStudyTimeUpdate;
         }
     }
 
@@ -69,7 +70,7 @@ public class PetController : MonoBehaviour
     private void HandleStudyTimeUpdate(float remainingTime)
     {
         // Trigger reminder when study time is up and not already reminding
-        if (remainingTime <= 0 && !isReminding && gameManager.CurrentState == GameManager.GameState.Studying)
+        if (remainingTime <= 0 && !isReminding && gameManager.currentState == GameManager.GameState.Studying)
         {
             TriggerReminder();
         }
@@ -86,8 +87,8 @@ public class PetController : MonoBehaviour
 
     public void TriggerReminder()
     {
-        if (gameManager.CurrentState != GameManager.GameState.Studying) return;
-        
+        if (gameManager.currentState != GameManager.GameState.Studying) return;
+
         SetPetState(REMINDING_PARAM);
         isReminding = true;
         lastReminderTime = Time.time;
@@ -96,7 +97,7 @@ public class PetController : MonoBehaviour
     // Called when user feeds the pet
     public void FeedPet()
     {
-        if (gameManager.CurrentState == GameManager.GameState.Resting)
+        if (gameManager.currentState == GameManager.GameState.Resting)
         {
             SetPetState(EATING_PARAM);
         }
@@ -105,7 +106,7 @@ public class PetController : MonoBehaviour
     // Called when user dresses the pet
     public void DressPet()
     {
-        if (gameManager.CurrentState == GameManager.GameState.Resting)
+        if (gameManager.currentState == GameManager.GameState.Resting)
         {
             SetPetState(DRESSING_PARAM);
         }

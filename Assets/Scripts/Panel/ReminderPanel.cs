@@ -10,7 +10,7 @@ public class ReminderPanel : BasePanel
     public Button cancelButton;
     public Text reminderMessage;
 
-    private GameManager gameManager;
+    private TaskSystem taskSystem;
     protected override void Awake()
     {
         base.Awake();
@@ -22,18 +22,20 @@ public class ReminderPanel : BasePanel
         confirmStartButton.onClick.AddListener(OnConfirmStartClicked);
         delayButton.onClick.AddListener(OnDelayClicked);
         cancelButton.onClick.AddListener(OnCancelClicked);
+
+        taskSystem = TaskSystem.Instance;
     }
 
     public void ShowReadyToTaskReminder()
     {
-        UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
-        reminderMessage.text = "It's time to start your study!";
+        reminderMessage.text = "任务即将开始，请做好准备！";
+        // UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
     }
 
     public void ShowTaskEndReminder()
     {
-        UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
         reminderMessage.text = "任务已完成！";
+        UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
 
         // 设置确认按钮文本和事件
         // 待处理：confirmStartButton位置未处理
@@ -48,7 +50,7 @@ public class ReminderPanel : BasePanel
     private void OnConfirmStartClicked()
     {
         UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
-        gameManager.ConfirmTaskStart(); // 用户确认开始任务
+        taskSystem.ConfirmTaskStart(); // 用户确认开始任务
     }
 
     private void OnDelayClicked()
@@ -61,6 +63,7 @@ public class ReminderPanel : BasePanel
     private void OnCancelClicked()
     {
         UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
+        UIManager.Instance.OpenPanel(UIConst.MainPanel);
         // 待处理：任务取消，后台会有操作
     }
     
