@@ -18,14 +18,7 @@ public class PackageDetail : MonoBehaviour
 
     private void Awake() {
         InitUIName();
-        Test();
     }
-
-    private void Test()
-    {
-        Refresh(GameManager.Instance.GetPackageLocalData()[1], null);
-    }
-
     private void InitUIName()
     {
         UIStars = transform.Find("Center/Stars");

@@ -4,116 +4,69 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement; // 添加场景管理命名空间
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
-    public static GameManager Instance { get; private set; }
-
-    // Scene-loaded event for UI initialization
-    public event Action OnSceneLoaded;
-
-    // Game states
-    public enum GameState { Idle, Studying, Resting }
-
-    // Events
-    public event Action<GameState> OnGameStateChanged;
-    public GameState currentState = GameState.Idle;
-
-    private TaskPanel taskPanel;
-    private TaskSystem taskSystem;
-    private void Awake()
+    public CharacterState currentState;
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-            InitializeGame();
-
-            // Subscribe to scene change events
-            SceneManager.sceneLoaded += OnSceneLoadedHandler;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        base.Awake();
+        InitializeGame();
     }
-
-    private void OnSceneLoadedHandler(Scene scene, LoadSceneMode mode)
-    {
-        // Notify subscribers that a new scene is loaded
-        OnSceneLoaded?.Invoke();
-    }
-
-    private void OnDestroy()
-    {
-        // Unsubscribe from scene change events
-        SceneManager.sceneLoaded -= OnSceneLoadedHandler;
-    }
-
     private void Start()
     {
-        // todo
-        UIManager.Instance.OpenPanel(UIConst.MainPanel);
-        // print(GetPackageLocalData().Count);
-        // print(GetPackageTable().DataList.Count);
+        currentState = CharacterState.Idle;
+        Debug.Log("Screen.width/height: " + Screen.width + "/" + Screen.height);
     }
-
-    // private bool isInitialized = false;
 
     private void InitializeGame()
     {
-        // if (isInitialized) return;
-
-        Debug.Log("初始化游戏");
-        // 初始化 taskSystem
-        taskSystem = FindObjectOfType<TaskSystem>();
-        SetGameState(GameState.Idle);
-
-        // isInitialized = true;
+        Debug.Log("游戏开始");
+        SetCharacterState(CharacterState.Idle);
     }
 
-    public void SetGameState(GameState newState)
+    public void SetCharacterState(CharacterState newState)
     {
-        Debug.Log($"SetGameState: {currentState} -> {newState}");
+        Debug.Log($"SetCharacterState: {currentState} -> {newState}");
         if (currentState == newState) return;
 
         // 处理场景切换
-        if (newState == GameState.Studying && currentState != GameState.Studying)
+        if (newState == CharacterState.Studying && currentState != CharacterState.Studying)
         {
             // 进入学习状态时切换到Studying场景
             SceneManager.LoadScene("Studying");
         }
-        else if (newState == GameState.Idle && currentState == GameState.Studying)
+        else if (newState == CharacterState.Idle && currentState == CharacterState.Studying)
         {
             // 退出学习状态时返回Home场景
             SceneManager.LoadScene("Home");
         }
 
         // 保存旧状态
-        GameState previousState = currentState;
+        CharacterState previousState = currentState;
         currentState = newState;
 
         // 只在状态真正改变时触发事件
         if (previousState != newState)
         {
-            OnGameStateChanged?.Invoke(newState);
+            EventHandler.CallCharacterStateChangedEvent(newState);
         }
 
         // 避免在Idle状态重复触发
-        if (newState != GameState.Idle)
+        if (newState != CharacterState.Idle)
         {
             switch (newState)
             {
-                case GameState.Studying:
+                case CharacterState.Studying:
                     // 确保不在同一个状态下重复启动协程
-                    if (previousState != GameState.Studying)
+                    if (previousState != CharacterState.Studying)
                     {
                         Debug.Log("开始学习会话");
-                        StartCoroutine(taskSystem.StudySession());
+                        StartCoroutine(TaskSystem.Instance.StudySession());
                     }
                     break;
-                case GameState.Resting:
+                case CharacterState.Resting:
                     // 确保不在同一个状态下重复启动协程
-                    if (previousState != GameState.Resting)
+                    if (previousState != CharacterState.Resting)
                     {
                         Debug.Log("开始休息会话");
                         StartCoroutine(RestSession());
@@ -123,24 +76,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
-
-
     private IEnumerator RestSession()
     {
         Debug.Log("RestSession 开始");
         float restTime = 0f;
         float maxRestTime = 5 * 60; // 5 minutes in seconds
 
-        while (currentState == GameState.Resting && restTime < maxRestTime)
+        while (currentState == CharacterState.Resting && restTime < maxRestTime)
         {
             restTime += Time.deltaTime;
             yield return null;
         }
 
         // Return to studying after rest
-        if (currentState == GameState.Resting)
+        if (currentState == CharacterState.Resting)
         {
-            SetGameState(GameState.Studying);
+            SetCharacterState(CharacterState.Studying);
         }
         Debug.Log("RestSession 结束");
     }
@@ -186,7 +137,7 @@ public class GameManager : MonoBehaviour
         }
         return null;
     }
-    
+
     public List<PackageLocalItem> GetSortPackageLocalData()
     {
         List<PackageLocalItem> localItems = PackageLocalData.Instance.LoadPackage();

@@ -52,7 +52,6 @@ public class MenuPanel : BasePanel
     public void OnCloseButtonClicked()
     {
         ClosePanel();
-        UIManager.Instance.OpenPanel(UIConst.MainPanel);
     }
 
     // Volume control methods

@@ -27,7 +27,6 @@ public class MainPanel : BasePanel
     public void OnMenuBtnClicked()
     {
         UIManager.Instance.OpenPanel(UIConst.MenuPanel);
-        ClosePanel();
     }
 
     public void OnEmailBtnClicked()

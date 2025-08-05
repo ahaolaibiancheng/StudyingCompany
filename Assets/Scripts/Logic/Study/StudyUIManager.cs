@@ -17,6 +17,16 @@ public class StudyUIManager : MonoBehaviour
     private TaskPanel taskPanel;
     private TaskSystem taskSystem;
 
+    private void OnEnable()
+    {
+        EventHandler.StudyTimeUpdatedEvent += OnStudyTimeUpdatedEvent;
+    }
+
+    private void OnDisable()
+    {
+        EventHandler.StudyTimeUpdatedEvent -= OnStudyTimeUpdatedEvent;
+    }
+
     private void Start()
     {
         gameManager = GameManager.Instance;
@@ -25,11 +35,9 @@ public class StudyUIManager : MonoBehaviour
         if (gameManager != null)
         {
             Debug.Log("GameManager instance found");
-            // Subscribe to events
-            taskSystem.OnStudyTimeUpdated += UpdateTimerDisplay;
 
             // Initialize UI
-            UpdateTimerDisplay(taskSystem.remainingStudyTime);
+            OnStudyTimeUpdatedEvent(taskSystem.remainingStudyTime);
         }
 
         // Set up button listeners
@@ -50,16 +58,7 @@ public class StudyUIManager : MonoBehaviour
             UpdateMagnifierIcon(false);
         }
     }
-
-    private void OnDestroy()
-    {
-        if (gameManager != null)
-        {
-            taskSystem.OnStudyTimeUpdated -= UpdateTimerDisplay;
-        }
-    }
-
-    private void UpdateTimerDisplay(float remainingTime)
+    private void OnStudyTimeUpdatedEvent(float remainingTime)
     {
         // Format remaining time as minutes:seconds
         int minutes = Mathf.FloorToInt(remainingTime / 60);

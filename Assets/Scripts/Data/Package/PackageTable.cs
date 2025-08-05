@@ -1,6 +1,4 @@
 // 静态的、配置数据
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 

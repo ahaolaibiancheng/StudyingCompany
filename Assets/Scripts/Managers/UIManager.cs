@@ -1,64 +1,9 @@
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using System;
-using Unity.VisualScripting;
-using UnityEngine.PlayerLoop;
-using System.Collections;
 using System.Collections.Generic;
 
-public class UIManager : MonoBehaviour
+public class UIManager : Singleton<UIManager>
 {
-    // private void OnEnable()
-    // {
-    //     // Subscribe to scene loaded event
-    //     if (GameManager.Instance != null)
-    //     {
-    //         GameManager.Instance.OnSceneLoaded += InitializeUI;
-    //     }
-    // }
-
-    // private void OnDisable()
-    // {
-    //     // Unsubscribe from scene loaded event
-    //     if (GameManager.Instance != null)
-    //     {
-    //         GameManager.Instance.OnSceneLoaded -= InitializeUI;
-    //     }
-    // }
-
-    // private void InitializeUI()
-    // {
-    //     // Reinitialize UI elements when scene changes
-    //     Debug.Log("Initializing UI for current scene");
-
-    //     // Add your UI initialization code here
-    //     // This will be called every time a new scene is loaded
-    // }
-    private void OnDestroy()
-    {
-        if (gameManager != null)
-        {
-            gameManager.OnGameStateChanged -= HandleGameStateChange;
-        }
-    }
-
-    private void HandleGameStateChange(GameManager.GameState newState)
-    {
-        switch (newState)
-        {
-            case GameManager.GameState.Idle:
-                break;
-            case GameManager.GameState.Studying:
-                // Study Panel is now handled in the Studying scene
-                SceneManager.LoadScene("Studying");
-                break;
-            case GameManager.GameState.Resting:
-                // Resting state handled in Study scene
-                break;
-        }
-    }
-    private static UIManager _instance;
     private Transform _uiRoot;
     // 路径配置字典
     private Dictionary<string, string> pathDict;
@@ -66,52 +11,52 @@ public class UIManager : MonoBehaviour
     private Dictionary<string, GameObject> prefabDict;
     // 已打开界面的缓存字典
     public Dictionary<string, BasePanel> panelDict;
-    private GameManager gameManager;
-    
-    public static UIManager Instance
+
+    private void OnEnable()
     {
-        get
+        EventHandler.CharacterStateChangedEvent += OnCharacterStateChangedEvent;
+    }
+
+    private void OnDisable()
+    {
+        EventHandler.CharacterStateChangedEvent -= OnCharacterStateChangedEvent;
+    }
+
+    private void OnCharacterStateChangedEvent(CharacterState newState)
+    {
+        switch (newState)
         {
-            if (_instance == null)
-            {
-                _instance = FindObjectOfType<UIManager>();
-                
-                if (_instance == null)
-                {
-                    GameObject uiManagerObject = new GameObject("UIManager");
-                    _instance = uiManagerObject.AddComponent<UIManager>();
-                }
-            }
-            return _instance;
+            case CharacterState.Idle:
+                break;
+            case CharacterState.Studying:
+                // Study Panel is now handled in the Studying scene
+                SceneManager.LoadScene("Studying");
+                break;
+            case CharacterState.Resting:
+                // Resting state handled in Study scene
+                break;
         }
     }
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (_instance == null)
-        {
-            _instance = this;
-            InitDicts();
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (_instance != this)
-        {
-            Destroy(gameObject);
-        }
+        base.Awake();
+        InitDicts();
     }
-    
-    private void Start()
+
+    private void InitDicts()
     {
-        // InitDicts();    // 不能在Awake里初始化
+        prefabDict = new Dictionary<string, GameObject>();
+        panelDict = new Dictionary<string, BasePanel>();
 
-        gameManager = GameManager.Instance;
-
-        // Register events
-        if (gameManager != null)
+        pathDict = new Dictionary<string, string>()
         {
-            gameManager.OnGameStateChanged += HandleGameStateChange;
-        }
-
+            {UIConst.MenuPanel, "MenuPanel"},
+            {UIConst.TaskPanel, "TaskPanel"},
+            {UIConst.ReminderPanel, "ReminderPanel"},
+            {UIConst.PackagePanel, "PackagePanel"},
+            // {UIConst.LotteryPanel, "LotteryPanel"},
+        };
     }
 
     public Transform UIRoot
@@ -132,22 +77,6 @@ public class UIManager : MonoBehaviour
             ;
             return _uiRoot;
         }
-    }
-
-    private void InitDicts()
-    {
-        prefabDict = new Dictionary<string, GameObject>();
-        panelDict = new Dictionary<string, BasePanel>();
-
-        pathDict = new Dictionary<string, string>()
-        {
-            {UIConst.MainPanel, "Main/MainPanel"},
-            {UIConst.MenuPanel, "MenuPanel"},
-            {UIConst.TaskPanel, "TaskPanel"},
-            {UIConst.ReminderPanel, "ReminderPanel"},
-            {UIConst.PackagePanel, "PackagePanel"},
-            // {UIConst.LotteryPanel, "Lottery/LotteryPanel"},
-        };
     }
 
     public BasePanel GetPanel(string name)
@@ -202,13 +131,13 @@ public class UIManager : MonoBehaviour
         }
 
         // 打开界面，挂载在UIRoot下
-        GameObject panelObject = GameObject.Instantiate(panelPrefab, UIRoot, false);
+        GameObject panelObject = Instantiate(panelPrefab, UIRoot, false);
         if (panelObject == null)
         {
             Debug.LogError($"实例化预制体失败: {name}");
             return null;
         }
-        
+
         panel = panelObject.GetComponent<BasePanel>();
         if (panel == null)
         {
@@ -238,11 +167,9 @@ public class UIManager : MonoBehaviour
 
 public class UIConst
 {
-    public const string MainPanel = "MainPanel";
     public const string MenuPanel = "MenuPanel";
     public const string TaskPanel = "TaskPanel";
     public const string ReminderPanel = "ReminderPanel";
     public const string PackagePanel = "PackagePanel";
     // public const string LotteryPanel = "LotteryPanel";
 }
-

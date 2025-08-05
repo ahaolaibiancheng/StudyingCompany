@@ -55,7 +55,7 @@ public class InventorySystem : MonoBehaviour
     public void AddRandomItem()
     {
         int rewardType = UnityEngine.Random.Range(0, 2);
-        
+
         if (rewardType == 0 && foodItems.Length > 0)
         {
             int index = UnityEngine.Random.Range(0, foodItems.Length);
@@ -121,3 +121,5 @@ public class InventorySystem : MonoBehaviour
         OnInventoryUpdated?.Invoke();
     }
 }
+
+

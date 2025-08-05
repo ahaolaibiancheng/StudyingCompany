@@ -58,6 +58,5 @@ public class TaskPanel : BasePanel
     private void OnCloseClicked()
     {
         UIManager.Instance.ClosePanel(UIConst.TaskPanel);
-        UIManager.Instance.OpenPanel(UIConst.MainPanel);
     }
 }

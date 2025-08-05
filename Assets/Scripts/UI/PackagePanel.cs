@@ -126,24 +126,24 @@ public class PackagePanel : BasePanel
 
     private void InitUIName()
     {
-        UIMenu = transform.Find("TopCenter/Menus");
-        UIMenuDress = transform.Find("TopCenter/Menus/Dress");
-        UIMenuFood = transform.Find("TopCenter/Menus/Food");
-        // UITabName = transform.Find("LeftTop/TabName");
-        // UICloseBtn = transform.Find("RightTop/Close");
-        UICenter = transform.Find("Center");
-        UIScrollView = transform.Find("Center/Scroll View");
-        UIDetailPanel = transform.Find("Center/DetailPanel");
-        // UILeftBtn = transform.Find("Left/Button");
-        // UIRightBtn = transform.Find("Right/Button");
+        UIMenu = transform.Find("PackagePanel/TopCenter/Menus");
+        UIMenuDress = transform.Find("PackagePanel/TopCenter/Menus/Dress");
+        UIMenuFood = transform.Find("PackagePanel/TopCenter/Menus/Food");
+        // UITabName = transform.Find("PackagePanel/LeftTop/TabName");
+        // UICloseBtn = transform.Find("PackagePanel/RightTop/Close");
+        UICenter = transform.Find("PackagePanel/Center");
+        UIScrollView = transform.Find("PackagePanel/Center/Scroll View");
+        UIDetailPanel = transform.Find("PackagePanel/Center/DetailPanel");
+        // UILeftBtn = transform.Find("PackagePanel/Left/Button");
+        // UIRightBtn = transform.Find("PackagePanel/Right/Button");
 
-        UIDeletePanel = transform.Find("Bottom/DeletePanel");
-        UIDeleteBackBtn = transform.Find("Bottom/DeletePanel/Back");
-        UIDeleteInfoText = transform.Find("Bottom/DeletePanel/InfoText");
-        UIDeleteConfirmBtn = transform.Find("Bottom/DeletePanel/ConfirmBtn");
-        UIBottomMenus = transform.Find("Bottom/BottomMenus");
-        UIDeleteBtn = transform.Find("Bottom/BottomMenus/DeleteBtn");
-        UIDetailBtn = transform.Find("Bottom/BottomMenus/DetailBtn");
+        UIDeletePanel = transform.Find("PackagePanel/Bottom/DeletePanel");
+        UIDeleteBackBtn = transform.Find("PackagePanel/Bottom/DeletePanel/Back");
+        UIDeleteInfoText = transform.Find("PackagePanel/Bottom/DeletePanel/InfoText");
+        UIDeleteConfirmBtn = transform.Find("PackagePanel/Bottom/DeletePanel/ConfirmBtn");
+        UIBottomMenus = transform.Find("PackagePanel/Bottom/BottomMenus");
+        UIDeleteBtn = transform.Find("PackagePanel/Bottom/BottomMenus/DeleteBtn");
+        UIDetailBtn = transform.Find("PackagePanel/Bottom/BottomMenus/DetailBtn");
 
         // UIDeletePanel.gameObject.SetActive(false);
         // UIBottomMenus.gameObject.SetActive(true);
@@ -177,7 +177,6 @@ public class PackagePanel : BasePanel
     {
         print(">>>>> OnClickClose");
         ClosePanel();
-        UIManager.Instance.OpenPanel(UIConst.MainPanel);
     }
 
     private void OnClickLeft()

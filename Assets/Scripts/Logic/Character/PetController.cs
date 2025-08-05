@@ -1,9 +1,7 @@
 using UnityEngine;
 
-public class PetController : MonoBehaviour
+public class PetController : Singleton<PetController>
 {
-    public static PetController Instance { get; private set; }
-
     private Animator animator;
     private GameManager gameManager;
     private TaskSystem taskSystem;
@@ -18,34 +16,11 @@ public class PetController : MonoBehaviour
     private float lastReminderTime;
     private bool isReminding = false;
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
 
-        if (gameManager != null)
-        {
-            gameManager.OnGameStateChanged += HandleGameStateChange;
-            taskSystem.OnStudyTimeUpdated += HandleStudyTimeUpdate;
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (gameManager != null)
-        {
-            gameManager.OnGameStateChanged -= HandleGameStateChange;
-            taskSystem.OnStudyTimeUpdated -= HandleStudyTimeUpdate;
-        }
     }
 
     private void Start()
@@ -53,13 +28,25 @@ public class PetController : MonoBehaviour
         SetPetState(IDLE_PARAM);
     }
 
-    private void HandleGameStateChange(GameManager.GameState newState)
+    private void OnEnable()
     {
-        if (newState == GameManager.GameState.Idle)
+        EventHandler.CharacterStateChangedEvent += OnCharacterStateChangedEvent;
+        EventHandler.StudyTimeUpdatedEvent += OnStudyTimeUpdatedEvent;
+    }
+
+    private void OnDisable()
+    {
+        EventHandler.CharacterStateChangedEvent += OnCharacterStateChangedEvent;
+        EventHandler.StudyTimeUpdatedEvent -= OnStudyTimeUpdatedEvent;
+    }
+
+    private void OnCharacterStateChangedEvent(CharacterState newState)
+    {
+        if (newState == CharacterState.Idle)
         {
             SetPetState(IDLE_PARAM);
         }
-        else if (newState == GameManager.GameState.Studying && isReminding)
+        else if (newState == CharacterState.Studying && isReminding)
         {
             // Stop reminding when study resumes
             SetPetState(IDLE_PARAM);
@@ -67,10 +54,10 @@ public class PetController : MonoBehaviour
         }
     }
 
-    private void HandleStudyTimeUpdate(float remainingTime)
+    private void OnStudyTimeUpdatedEvent(float remainingTime)
     {
         // Trigger reminder when study time is up and not already reminding
-        if (remainingTime <= 0 && !isReminding && gameManager.currentState == GameManager.GameState.Studying)
+        if (remainingTime <= 0 && !isReminding && gameManager.currentState == CharacterState.Studying)
         {
             TriggerReminder();
         }
@@ -87,7 +74,7 @@ public class PetController : MonoBehaviour
 
     public void TriggerReminder()
     {
-        if (gameManager.currentState != GameManager.GameState.Studying) return;
+        if (gameManager.currentState != CharacterState.Studying) return;
 
         SetPetState(REMINDING_PARAM);
         isReminding = true;
@@ -97,7 +84,7 @@ public class PetController : MonoBehaviour
     // Called when user feeds the pet
     public void FeedPet()
     {
-        if (gameManager.currentState == GameManager.GameState.Resting)
+        if (gameManager.currentState == CharacterState.Resting)
         {
             SetPetState(EATING_PARAM);
         }
@@ -106,7 +93,7 @@ public class PetController : MonoBehaviour
     // Called when user dresses the pet
     public void DressPet()
     {
-        if (gameManager.currentState == GameManager.GameState.Resting)
+        if (gameManager.currentState == CharacterState.Resting)
         {
             SetPetState(DRESSING_PARAM);
         }

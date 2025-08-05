@@ -3,9 +3,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class TaskSystem : MonoBehaviour
+public class TaskSystem : Singleton<TaskSystem>
 {
-    public static TaskSystem Instance { get; private set; }
     private GameManager gameManager;
 
     [System.Serializable]
@@ -20,19 +19,10 @@ public class TaskSystem : MonoBehaviour
 
     private List<StudyTask> tasks = new List<StudyTask>();
 
-    private void Awake()
+    protected override void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-            InitializeTask();
-            LoadTasks();
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        InitializeTask();
+        LoadTasks();
     }
 
     private void InitializeTask()
@@ -132,12 +122,12 @@ public class TaskSystem : MonoBehaviour
     private DateTime taskStartTime;
     private DateTime taskEndTime;
     private bool isStudyPaused = false;
-    public event Action<float> OnStudyTimeUpdated;
+
 
     private IEnumerator WaitForTaskStart(float delay)
     {
         yield return new WaitForSeconds(delay);
-        gameManager.SetGameState(GameManager.GameState.Studying);
+        gameManager.SetCharacterState(CharacterState.Studying);
     }
 
     private void CancelStartTaskWait()
@@ -163,7 +153,7 @@ public class TaskSystem : MonoBehaviour
         //     Debug.LogError("GameManager instance is null in ConfirmTaskStart!");
         //     return;
         // }
-        
+
         // // 更新本地引用
         // gameManager = GameManager.Instance;
 
@@ -179,7 +169,7 @@ public class TaskSystem : MonoBehaviour
         if (DateTime.Now >= taskStartTime)
         {
             // 如果已经过了开始时间，立即开始
-            gameManager.SetGameState(GameManager.GameState.Studying);
+            gameManager.SetCharacterState(CharacterState.Studying);
         }
         else
         {
@@ -255,7 +245,7 @@ public class TaskSystem : MonoBehaviour
         isStudyPaused = false;
 
         // 不再重置 currentSessionTime，而是持续累加
-        while (gameManager.currentState == GameManager.GameState.Studying)
+        while (gameManager.currentState == CharacterState.Studying)
         {
             if (!isStudyPaused)
             {
@@ -263,7 +253,7 @@ public class TaskSystem : MonoBehaviour
                 remainingStudyTime -= Time.deltaTime;
 
                 // Debug.Log($"更新学习时间: session={currentSessionTime}, remaining={remainingStudyTime}");
-                OnStudyTimeUpdated?.Invoke(remainingStudyTime);
+                EventHandler.CallStudyTimeUpdatedEvent(remainingStudyTime);
 
                 // 检查学习时间是否结束
                 if (remainingStudyTime <= 0)
@@ -289,7 +279,7 @@ public class TaskSystem : MonoBehaviour
     {
         // Reward player with random item
         // InventorySystem.Instance.AddRandomItem();
-        gameManager.SetGameState(GameManager.GameState.Idle);
+        gameManager.SetCharacterState(CharacterState.Idle);
 
         // 完成任务时重置累计时间
         currentSessionTime = 0f;

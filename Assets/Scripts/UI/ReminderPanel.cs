@@ -63,13 +63,11 @@ public class ReminderPanel : BasePanel
     private void OnCancelClicked()
     {
         UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
-        UIManager.Instance.OpenPanel(UIConst.MainPanel);
         // 待处理：任务取消，后台会有操作
     }
     
     private void OnTaskEndConfirmed()
     {
         UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
-        UIManager.Instance.OpenPanel(UIConst.MainPanel);
     }
 }
