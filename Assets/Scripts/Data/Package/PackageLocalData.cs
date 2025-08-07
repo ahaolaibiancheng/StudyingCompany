@@ -19,7 +19,7 @@ public class PackageLocalData
     }
 
 
-    public List<PackageLocalItem> items;
+    public List<PackageLocalItem> packageLocalItems;
 
     public void SavePackage()
     {
@@ -30,21 +30,21 @@ public class PackageLocalData
 
     public List<PackageLocalItem> LoadPackage()
     {
-        if (items != null)
+        if (packageLocalItems != null)
         {
-            return items;
+            return packageLocalItems;
         }
         if (PlayerPrefs.HasKey("PackageLocalData"))
         {
             string inventoryJson = PlayerPrefs.GetString("PackageLocalData");
             PackageLocalData packageLocalData = JsonUtility.FromJson<PackageLocalData>(inventoryJson);
-            items = packageLocalData.items;
-            return items;
+            packageLocalItems = packageLocalData.packageLocalItems;
+            return packageLocalItems;
         }
         else
         {
-            items = new List<PackageLocalItem>();
-            return items;
+            packageLocalItems = new List<PackageLocalItem>();
+            return packageLocalItems;
         }
     }
 }

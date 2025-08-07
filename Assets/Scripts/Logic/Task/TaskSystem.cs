@@ -5,8 +5,6 @@ using System.Collections.Generic;
 
 public class TaskSystem : Singleton<TaskSystem>
 {
-    private GameManager gameManager;
-
     [System.Serializable]
     public class StudyTask
     {
@@ -27,8 +25,6 @@ public class TaskSystem : Singleton<TaskSystem>
 
     private void InitializeTask()
     {
-        Debug.Log("初始化Task系统");
-        gameManager = GameManager.Instance;
         remainingStudyTime = studyDuration * 60; // Convert to seconds
     }
 
@@ -127,7 +123,7 @@ public class TaskSystem : Singleton<TaskSystem>
     private IEnumerator WaitForTaskStart(float delay)
     {
         yield return new WaitForSeconds(delay);
-        gameManager.SetCharacterState(CharacterState.Studying);
+        GameManager.Instance.SetCharacterState(CharacterState.Studying);
     }
 
     private void CancelStartTaskWait()
@@ -147,16 +143,6 @@ public class TaskSystem : Singleton<TaskSystem>
 
     public void ConfirmTaskStart()
     {
-        // // 确保GameManager实例已初始化
-        // if (GameManager.Instance == null)
-        // {
-        //     Debug.LogError("GameManager instance is null in ConfirmTaskStart!");
-        //     return;
-        // }
-
-        // // 更新本地引用
-        // gameManager = GameManager.Instance;
-
         // 取消可能正在进行的等待
         CancelStartTaskWait();
 
@@ -169,7 +155,7 @@ public class TaskSystem : Singleton<TaskSystem>
         if (DateTime.Now >= taskStartTime)
         {
             // 如果已经过了开始时间，立即开始
-            gameManager.SetCharacterState(CharacterState.Studying);
+            GameManager.Instance.SetCharacterState(CharacterState.Studying);
         }
         else
         {
@@ -245,7 +231,7 @@ public class TaskSystem : Singleton<TaskSystem>
         isStudyPaused = false;
 
         // 不再重置 currentSessionTime，而是持续累加
-        while (gameManager.currentState == CharacterState.Studying)
+        while (GameManager.Instance.currentState == CharacterState.Studying)
         {
             if (!isStudyPaused)
             {
@@ -279,7 +265,7 @@ public class TaskSystem : Singleton<TaskSystem>
     {
         // Reward player with random item
         // InventorySystem.Instance.AddRandomItem();
-        gameManager.SetCharacterState(CharacterState.Idle);
+        GameManager.Instance.SetCharacterState(CharacterState.Idle);
 
         // 完成任务时重置累计时间
         currentSessionTime = 0f;
@@ -288,14 +274,7 @@ public class TaskSystem : Singleton<TaskSystem>
         CancelReminderTimer();
 
         // 显示任务结束提醒
-        if (UIManager.Instance != null)
-        {
-            // UIManager.Instance.ShowTaskEndReminder();
-        }
-        else
-        {
-            Debug.LogError("UIManager instance is null in GameManager.CompleteTask");
-        }
+        // UIManager.Instance.ShowTaskEndReminder();
     }
 
     public void PauseStudy()

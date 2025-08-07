@@ -5,7 +5,7 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "PackageSystem/PackageTable", fileName = "PackageTable")]
 public class PackageTable : ScriptableObject
 {
-    public List<PackageTableItem> DataList = new List<PackageTableItem>();
+    public List<PackageTableItem> packageTableItems = new List<PackageTableItem>();
 }
 
 [System.Serializable]

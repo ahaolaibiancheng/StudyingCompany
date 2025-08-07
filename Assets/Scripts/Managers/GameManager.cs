@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement; // 添加场景管理命名空间
+using UnityEngine.SceneManagement;
 
 public class GameManager : Singleton<GameManager>
 {
@@ -33,12 +33,14 @@ public class GameManager : Singleton<GameManager>
         if (newState == CharacterState.Studying && currentState != CharacterState.Studying)
         {
             // 进入学习状态时切换到Studying场景
-            SceneManager.LoadScene("Studying");
+            // SceneManager.LoadScene("Studying");
+            TransitionManager.Instance.Transtion("Home", "Studying");
         }
         else if (newState == CharacterState.Idle && currentState == CharacterState.Studying)
         {
             // 退出学习状态时返回Home场景
-            SceneManager.LoadScene("Home");
+            // SceneManager.LoadScene("Home");
+            TransitionManager.Instance.Transtion("Studying", "Home");
         }
 
         // 保存旧状态
@@ -114,7 +116,7 @@ public class GameManager : Singleton<GameManager>
 
     public PackageTableItem GetPackageItemById(int id)
     {
-        List<PackageTableItem> packageDataList = GetPackageTable().DataList;
+        List<PackageTableItem> packageDataList = GetPackageTable().packageTableItems;
         foreach (PackageTableItem item in packageDataList)
         {
             if (item.id == id)

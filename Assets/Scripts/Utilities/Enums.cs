@@ -7,3 +7,8 @@ public enum PetState
 {
     Idle, Wrming, Eating
 }
+
+public enum PackageMode
+{
+    normal, delete, sort,
+}

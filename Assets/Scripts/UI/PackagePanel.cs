@@ -3,14 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public enum PackageMode
-{
-    normal,
-    delete,
-    sort,
-}
-
-
 public class PackagePanel : BasePanel
 {
     private Transform UIMenu;
@@ -80,17 +72,12 @@ public class PackagePanel : BasePanel
     override protected void Awake()
     {
         base.Awake();
-        InitUI();
+        InitUIName();
+        InitClick();
     }
 
     private void Start() {
         RefreshUI();
-    }
-
-    private void InitUI()
-    {
-        InitUIName();
-        InitClick();
     }
 
     private void RefreshUI()
