@@ -8,14 +8,12 @@ public class StudyUIManager : MonoBehaviour
     public Text remainingTimeText;
     public Button pauseButton;
     public Button continueButton;
-    public Button magnifierButton; // 放大镜控制按钮
-    public Image magnifierIcon;    // 放大镜图标（可选视觉反馈）
+    // public Button magnifierButton; // 放大镜控制按钮
+    // public Image magnifierIcon;    // 放大镜图标（可选视觉反馈）
 
-    [Header("Magnifier Settings")]
-    public ScreenMagnifier screenMagnifier; // 引用放大镜组件
-    private GameManager gameManager;
+    // [Header("Magnifier Settings")]
+    // public ScreenMagnifier screenMagnifier; // 引用放大镜组件
     private TaskPanel taskPanel;
-    private TaskSystem taskSystem;
 
     private void OnEnable()
     {
@@ -29,34 +27,19 @@ public class StudyUIManager : MonoBehaviour
 
     private void Start()
     {
-        gameManager = GameManager.Instance;
-        taskSystem = TaskSystem.Instance;
+        OnStudyTimeUpdatedEvent(TaskSystem.Instance.remainingStudyTime);
 
-        if (gameManager != null)
-        {
-            Debug.Log("GameManager instance found");
-
-            // Initialize UI
-            OnStudyTimeUpdatedEvent(taskSystem.remainingStudyTime);
-        }
-
-        // Set up button listeners
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
         continueButton.onClick.AddListener(OnContinueButtonClicked);
+        // magnifierButton.onClick.AddListener(ToggleMagnifier);
+
         continueButton.gameObject.SetActive(false);
-
-        // 设置放大镜按钮监听
-        if (magnifierButton != null)
-        {
-            magnifierButton.onClick.AddListener(ToggleMagnifier);
-        }
-
-        // 初始状态：放大镜关闭
-        if (screenMagnifier != null)
-        {
-            screenMagnifier.ToggleMagnifier(false);
-            UpdateMagnifierIcon(false);
-        }
+        // // 初始状态：放大镜关闭
+        // if (screenMagnifier != null)
+        // {
+        //     screenMagnifier.ToggleMagnifier(false);
+        //     UpdateMagnifierIcon(false);
+        // }
     }
     private void OnStudyTimeUpdatedEvent(float remainingTime)
     {
@@ -66,40 +49,40 @@ public class StudyUIManager : MonoBehaviour
         remainingTimeText.text = $"Remaing: {minutes:00}:{seconds:00}";
 
         // Update session time display
-        int sessionMinutes = Mathf.FloorToInt(taskSystem.currentSessionTime / 60);
+        int sessionMinutes = Mathf.FloorToInt(TaskSystem.Instance.currentSessionTime / 60);
         sessionTimeText.text = $"Session: {sessionMinutes} min";
     }
 
     private void OnPauseButtonClicked()
     {
-        taskSystem.PauseStudy();
+        TaskSystem.Instance.PauseStudy();
         pauseButton.gameObject.SetActive(false);
         continueButton.gameObject.SetActive(true);
     }
 
     private void OnContinueButtonClicked()
     {
-        taskSystem.ResumeStudy();
+        TaskSystem.Instance.ResumeStudy();
         continueButton.gameObject.SetActive(false);
         pauseButton.gameObject.SetActive(true);
     }
 
-    // 放大镜开关功能
-    private void ToggleMagnifier()
-    {
-        if (screenMagnifier == null) return;
+    // // 放大镜开关功能
+    // private void ToggleMagnifier()
+    // {
+    //     if (screenMagnifier == null) return;
 
-        bool newState = !screenMagnifier.gameObject.activeSelf;
-        screenMagnifier.ToggleMagnifier(newState);
-        UpdateMagnifierIcon(newState);
-    }
+    //     bool newState = !screenMagnifier.gameObject.activeSelf;
+    //     screenMagnifier.ToggleMagnifier(newState);
+    //     UpdateMagnifierIcon(newState);
+    // }
 
-    // 更新放大镜图标状态
-    private void UpdateMagnifierIcon(bool isActive)
-    {
-        if (magnifierIcon != null)
-        {
-            magnifierIcon.color = isActive ? Color.white : new Color(1, 1, 1, 0.5f);
-        }
-    }
+    // // 更新放大镜图标状态
+    // private void UpdateMagnifierIcon(bool isActive)
+    // {
+    //     if (magnifierIcon != null)
+    //     {
+    //         magnifierIcon.color = isActive ? Color.white : new Color(1, 1, 1, 0.5f);
+    //     }
+    // }
 }

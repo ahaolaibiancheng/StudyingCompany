@@ -3,8 +3,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class TaskSystem : Singleton<TaskSystem>
+public class TaskSystem : MonoBehaviour
 {
+    public static TaskSystem Instance;
+    [Header("任务时间")]
+    public int timeBeforeReminder = 5;  // 提前通知时长
+    public float studyDuration = 45f; // 学习时间片时长
+    public float currentSessionTime; // 累计学习时长
+    public float remainingStudyTime;    // 学习时间片剩余时长
+    
+    private Coroutine startTaskCoroutine; // 用于存储开始任务的协程
+    private Coroutine reminderCoroutine; // 存储协程引用
+    private DateTime taskStartTime;
+    private DateTime taskEndTime;
+    private bool isStudyPaused = false;
+
     [System.Serializable]
     public class StudyTask
     {
@@ -17,10 +30,23 @@ public class TaskSystem : Singleton<TaskSystem>
 
     private List<StudyTask> tasks = new List<StudyTask>();
 
-    protected override void Awake()
+    private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+
         InitializeTask();
         LoadTasks();
+
+        taskStartTime = DateTime.Now - TimeSpan.FromMinutes(5);
+        taskEndTime = DateTime.Now + TimeSpan.FromSeconds(10);
     }
 
     private void InitializeTask()
@@ -108,17 +134,6 @@ public class TaskSystem : Singleton<TaskSystem>
     {
         public List<StudyTask> tasks;
     }
-
-    private Coroutine startTaskCoroutine; // 用于存储开始任务的协程
-    private Coroutine reminderCoroutine; // 存储协程引用
-    public int timeBeforeReminder = 5;  // 提前通知时长
-    public float studyDuration = 45f; // 学习时间片时长
-    public float currentSessionTime; // 累计学习时长
-    public float remainingStudyTime;    // 学习时间片剩余时长
-    private DateTime taskStartTime;
-    private DateTime taskEndTime;
-    private bool isStudyPaused = false;
-
 
     private IEnumerator WaitForTaskStart(float delay)
     {
@@ -263,7 +278,6 @@ public class TaskSystem : Singleton<TaskSystem>
 
     public void CompleteTask()
     {
-        // Reward player with random item
         // InventorySystem.Instance.AddRandomItem();
         GameManager.Instance.SetCharacterState(CharacterState.Idle);
 
@@ -275,6 +289,10 @@ public class TaskSystem : Singleton<TaskSystem>
 
         // 显示任务结束提醒
         // UIManager.Instance.ShowTaskEndReminder();
+
+        // Reward player with random item
+        UIManager.Instance.OpenPanel(UIConst.RewardPanel);
+        EventHandler.CallStudyEndEvent();
     }
 
     public void PauseStudy()

@@ -4,13 +4,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class TransitionManager : Singleton<TransitionManager>
+public class TransitionManager : MonoBehaviour
 {
+    public static TransitionManager Instance;
     [SceneName] public string sceneName;
     public CanvasGroup fadeCanvasGroup;
     public float fadeDuration;
     private bool isfade;
     private bool canTransition;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {

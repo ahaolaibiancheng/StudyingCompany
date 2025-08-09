@@ -4,24 +4,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
-public class GameManager : Singleton<GameManager>
+public class GameManager : MonoBehaviour
 {
+    public static GameManager Instance;
     public CharacterState currentState;
-    protected override void Awake()
+
+    private void Awake()
     {
-        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
         InitializeGame();
     }
     private void Start()
     {
-        currentState = CharacterState.Idle;
-        Debug.Log("Screen.width/height: " + Screen.width + "/" + Screen.height);
+        // Debug.Log("Screen.width/height: " + Screen.width + "/" + Screen.height);
     }
 
     private void InitializeGame()
     {
         Debug.Log("游戏开始");
-        SetCharacterState(CharacterState.Idle);
+        SetCharacterState(CharacterState.Studying);
     }
 
     public void SetCharacterState(CharacterState newState)
@@ -34,13 +43,13 @@ public class GameManager : Singleton<GameManager>
         {
             // 进入学习状态时切换到Studying场景
             // SceneManager.LoadScene("Studying");
-            TransitionManager.Instance.Transtion("Home", "Studying");
+            TransitionManager.Instance.Transtion("Home", "Study");
         }
         else if (newState == CharacterState.Idle && currentState == CharacterState.Studying)
         {
             // 退出学习状态时返回Home场景
             // SceneManager.LoadScene("Home");
-            TransitionManager.Instance.Transtion("Studying", "Home");
+            // TransitionManager.Instance.Transtion("Study", "Home");
         }
 
         // 保存旧状态

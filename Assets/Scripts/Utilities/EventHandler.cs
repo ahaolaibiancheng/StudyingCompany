@@ -24,4 +24,10 @@ public static class EventHandler
     {
         StudyTimeUpdatedEvent?.Invoke(CharacterState);
     }
+
+    public static event Action StudyEndEvent;
+    public static void CallStudyEndEvent()
+    {
+        StudyEndEvent?.Invoke();
+    }
 }

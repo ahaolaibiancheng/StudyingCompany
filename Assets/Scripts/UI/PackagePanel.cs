@@ -117,7 +117,7 @@ public class PackagePanel : BasePanel
         UIMenuDress = transform.Find("PackagePanel/TopCenter/Menus/Dress");
         UIMenuFood = transform.Find("PackagePanel/TopCenter/Menus/Food");
         // UITabName = transform.Find("PackagePanel/LeftTop/TabName");
-        // UICloseBtn = transform.Find("PackagePanel/RightTop/Close");
+        UICloseBtn = transform.Find("PackagePanel/RightTop/Close");
         UICenter = transform.Find("PackagePanel/Center");
         UIScrollView = transform.Find("PackagePanel/Center/Scroll View");
         UIDetailPanel = transform.Find("PackagePanel/Center/DetailPanel");
@@ -140,7 +140,7 @@ public class PackagePanel : BasePanel
     {
         UIMenuDress.GetComponent<Button>().onClick.AddListener(OnClickDress);
         UIMenuFood.GetComponent<Button>().onClick.AddListener(OnClickFood);
-        // UICloseBtn.GetComponent<Button>().onClick.AddListener(OnClickClose);
+        UICloseBtn.GetComponent<Button>().onClick.AddListener(OnClickClose);
         // UILeftBtn.GetComponent<Button>().onClick.AddListener(OnClickLeft);
         // UIRightBtn.GetComponent<Button>().onClick.AddListener(OnClickRight);
 
@@ -162,7 +162,6 @@ public class PackagePanel : BasePanel
 
     private void OnClickClose()
     {
-        print(">>>>> OnClickClose");
         ClosePanel();
     }
 

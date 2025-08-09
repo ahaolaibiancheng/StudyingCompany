@@ -2,8 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections.Generic;
 
-public class UIManager : Singleton<UIManager>
+public class UIManager : MonoBehaviour
 {
+    public static UIManager Instance;
     private Transform _uiRoot;
     // 路径配置字典
     private Dictionary<string, string> pathDict;
@@ -30,7 +31,6 @@ public class UIManager : Singleton<UIManager>
                 break;
             case CharacterState.Studying:
                 // Study Panel is now handled in the Studying scene
-                SceneManager.LoadScene("Studying");
                 break;
             case CharacterState.Resting:
                 // Resting state handled in Study scene
@@ -38,9 +38,17 @@ public class UIManager : Singleton<UIManager>
         }
     }
 
-    protected override void Awake()
+    private void Awake()
     {
-        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
         InitDicts();
     }
 
@@ -55,6 +63,7 @@ public class UIManager : Singleton<UIManager>
             {UIConst.TaskPanel, "TaskPanel"},
             {UIConst.ReminderPanel, "ReminderPanel"},
             {UIConst.PackagePanel, "PackagePanel"},
+            {UIConst.RewardPanel, "RewardPanel"},
             // {UIConst.LotteryPanel, "LotteryPanel"},
         };
     }
@@ -171,5 +180,6 @@ public class UIConst
     public const string TaskPanel = "TaskPanel";
     public const string ReminderPanel = "ReminderPanel";
     public const string PackagePanel = "PackagePanel";
+    public const string RewardPanel = "RewardPanel";
     // public const string LotteryPanel = "LotteryPanel";
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public class PackageLocalData
 {
     private static PackageLocalData _instance;
+    public List<PackageLocalItem> packageLocalItems;
 
     public static PackageLocalData Instance
     {
@@ -17,9 +18,6 @@ public class PackageLocalData
             return _instance;
         }
     }
-
-
-    public List<PackageLocalItem> packageLocalItems;
 
     public void SavePackage()
     {
@@ -49,18 +47,17 @@ public class PackageLocalData
     }
 }
 
-
 [System.Serializable]
 public class PackageLocalItem
 {
-    public string uid;  //物品唯一标识符
-    public int id;  //物品ID（对应配置表中的ID）
+    public string uid;  // 物品唯一标识符
+    public int id;  // 物品ID（对应配置表中的ID）
     public int num;
     public int level;
     public bool isNew;
 
     public override string ToString()
     {
-        return string.Format("[id]:{0} [num]:{1}", id, num);
+        return string.Format("[uid]:{0} [id]:{1} [num]:{2}", uid, id, num);
     }
 }

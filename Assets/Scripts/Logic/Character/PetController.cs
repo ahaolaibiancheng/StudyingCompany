@@ -1,7 +1,8 @@
 using UnityEngine;
 
-public class PetController : Singleton<PetController>
+public class PetController : MonoBehaviour
 {
+    public static PetController Instance;
     private Animator animator;
     private GameManager gameManager;
     private TaskSystem taskSystem;
@@ -16,11 +17,20 @@ public class PetController : Singleton<PetController>
     private float lastReminderTime;
     private bool isReminding = false;
 
-    protected override void Awake()
+    private void Awake()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
-
     }
 
     private void Start()
