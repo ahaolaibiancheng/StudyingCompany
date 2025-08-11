@@ -42,6 +42,7 @@ public class MainPanel : BasePanel
 
     public void OnTaskBtnClicked()
     {
+        // this.GetComponent<CanvasGroup>().interactable = false;
         UIManager.Instance.OpenPanel(UIConst.TaskPanel);
     }
 

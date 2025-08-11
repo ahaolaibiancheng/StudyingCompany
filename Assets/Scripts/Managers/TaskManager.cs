@@ -3,9 +3,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-public class TaskSystem : MonoBehaviour
+public class TaskManager : MonoBehaviour
 {
-    public static TaskSystem Instance;
+    public static TaskManager Instance;
     [Header("任务时间")]
     public int timeBeforeReminder = 5;  // 提前通知时长
     public float studyDuration = 45f; // 学习时间片时长
@@ -18,17 +18,6 @@ public class TaskSystem : MonoBehaviour
     private DateTime taskEndTime;
     private bool isStudyPaused = false;
 
-    [System.Serializable]
-    public class StudyTask
-    {
-        public string taskName;
-        public DateTime startTime;
-        public DateTime endTime;
-        public bool isDaily;
-        public bool isCompleted;
-    }
-
-    private List<StudyTask> tasks = new List<StudyTask>();
 
     private void Awake()
     {
@@ -43,96 +32,118 @@ public class TaskSystem : MonoBehaviour
         }
 
         InitializeTask();
-        LoadTasks();
-
-        taskStartTime = DateTime.Now - TimeSpan.FromMinutes(5);
-        taskEndTime = DateTime.Now + TimeSpan.FromSeconds(10);
     }
 
     private void InitializeTask()
-    {
+    {   
+        // 加载任务
+        TaskData.Instance.LoadTasks();
+        // 初始化
         remainingStudyTime = studyDuration * 60; // Convert to seconds
-    }
-
-    private void LoadTasks()
-    {
-        if (PlayerPrefs.HasKey("StudyTasks"))
-        {
-            string json = PlayerPrefs.GetString("StudyTasks");
-            TaskWrapper wrapper = JsonUtility.FromJson<TaskWrapper>(json);
-            tasks = wrapper.tasks;
-        }
     }
 
     private void Start()
     {
-        InvokeRepeating("CheckTasks", 0f, 60f); // Check every minute
+        // InvokeRepeating("CheckTasks", 0f, 60f); // Check every minute
     }
 
-    public void CreateTask(string name, DateTime start, DateTime end, bool daily)
+    public StudyTask CreateNewTask(string frequency, DateTime startTime, DateTime endTime, string description)
     {
-        StudyTask newTask = new StudyTask
+        List<StudyTask> studyTaskList = TaskData.Instance.LoadTasks();
+        if (studyTaskList == null)
         {
-            taskName = name,
-            startTime = start,
-            endTime = end,
-            isDaily = daily,
+            Debug.LogError("Failed to load TaskData");
+            return null;
+        }
+
+        return new StudyTask
+        {
+            id = studyTaskList.Count,
+            frequency = frequency,
+            startTime = startTime,
+            endTime = endTime,
+            description = description,
             isCompleted = false
         };
-
-        tasks.Add(newTask);
-        SaveTasks();
     }
 
-    private void CheckTasks()
+    public bool CheckNewTask(StudyTask studyTask)
     {
-        DateTime now = DateTime.Now;
-
-        foreach (var task in tasks)
+        List<StudyTask> studyTaskList = TaskData.Instance.LoadTasks();
+        if (studyTaskList == null)
         {
-            if (!task.isCompleted && now >= task.startTime && now < task.endTime)
-            {
-                // Trigger task reminder
-                StartNewTask(task.startTime, task.endTime);
+            Debug.LogError("Failed to load TaskData");
+            return false;
+        }
 
-                // Mark as completed if it's a one-time task
-                if (!task.isDaily)
+        DateTime newTaskStart = studyTask.startTime;
+        DateTime newTaskEnd = studyTask.endTime;
+
+        foreach (var existingTask in studyTaskList)
+        {
+            // 跳过已完成的任务
+            if (existingTask.isCompleted)
+                continue;
+
+            DateTime existingTaskStart = existingTask.startTime;
+            DateTime existingTaskEnd = existingTask.endTime;
+
+            // 检查时间是否重叠
+            // 两个时间段重叠的条件是：新任务开始时间早于现有任务结束时间，
+            // 且新任务结束时间晚于现有任务开始时间
+            if (newTaskStart < existingTaskEnd && newTaskEnd > existingTaskStart)
+            {
+                return false; // 存在时间冲突
+            }
+
+            // 特殊情况：如果新任务是日常任务，还需要检查未来日期的冲突
+            if (studyTask.frequency == "Daily")
+            {
+                // 检查未来7天内是否有冲突（可根据需要调整天数）
+                for (int i = 1; i <= 7; i++)
                 {
-                    task.isCompleted = true;
+                    DateTime futureNewTaskStart = newTaskStart.AddDays(i);
+                    DateTime futureNewTaskEnd = newTaskEnd.AddDays(i);
+                    
+                    if (futureNewTaskStart < existingTaskEnd && futureNewTaskEnd > existingTaskStart)
+                    {
+                        return false; // 存在时间冲突
+                    }
                 }
             }
-            else if (task.isDaily && now.Date > task.startTime.Date)
+            
+            // 如果现有任务是日常任务，也需要检查未来日期
+            if (existingTask.frequency == "Daily")
             {
-                // Reset daily task for next day
-                if (now.Hour == 0 && now.Minute == 0)
+                // 检查现有任务未来7天内是否与新任务冲突
+                for (int i = 1; i <= 7; i++)
                 {
-                    task.startTime = task.startTime.AddDays(1);
-                    task.endTime = task.endTime.AddDays(1);
-                    task.isCompleted = false;
+                    DateTime futureExistingTaskStart = existingTaskStart.AddDays(i);
+                    DateTime futureExistingTaskEnd = existingTaskEnd.AddDays(i);
+                    
+                    if (newTaskStart < futureExistingTaskEnd && newTaskEnd > futureExistingTaskStart)
+                    {
+                        return false; // 存在时间冲突
+                    }
                 }
             }
         }
 
-        SaveTasks();
+        return true; // 无时间冲突
     }
 
-    public List<StudyTask> GetTasks()
+    public void SaveNewTask(StudyTask studyTask)
     {
-        return tasks;
-    }
+        List<StudyTask> studyTaskList = TaskData.Instance.LoadTasks();
+        if (studyTaskList == null)
+        {
+            Debug.LogError("Failed to load TaskData");
+            return;
+        }
 
-    private void SaveTasks()
-    {
-        string json = JsonUtility.ToJson(new TaskWrapper { tasks = tasks });
-        PlayerPrefs.SetString("StudyTasks", json);
-        PlayerPrefs.Save();
-    }
-
-    // Wrapper class for JSON serialization
-    [System.Serializable]
-    private class TaskWrapper
-    {
-        public List<StudyTask> tasks;
+        studyTaskList.Add(studyTask);
+        // TODO: 按照startTime进行排序 TaskManager.cs
+        TaskData.Instance.SaveTasks();
     }
 
     private IEnumerator WaitForTaskStart(float delay)
@@ -190,45 +201,25 @@ public class TaskSystem : MonoBehaviour
         currentSessionTime = 0f; // 开始新任务时重置累计时间
         remainingStudyTime = studyDuration * 60; // 重置剩余学习时间
 
-        // 取消现有计时器
-        CancelReminderTimer();
-
         // 计算距离任务开始前5分钟的时间差（秒）
         TimeSpan timeToReminder = startTime - DateTime.Now - TimeSpan.FromMinutes(timeBeforeReminder);
         float delaySeconds = (float)timeToReminder.TotalSeconds;
 
-        if (delaySeconds > 0)
+        if (delaySeconds > 5 * 60)  // 大于5min
         {
             // 启动协程定时器
             reminderCoroutine = StartCoroutine(ReminderCoroutine(delaySeconds));
         }
         else
         {
-            Debug.Log("任务开始时间不足5分钟，立即提醒");
-            if (UIManager.Instance != null)
-            {
-                UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
-                (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReadyToTaskReminder();
-            }
-            else
-            {
-                Debug.LogError("UIManager instance is null in TaskPanel.StartNewTask");
-            }
+            UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
+            string text = "任务开始时间不足5分钟，立即提醒";
+            (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReadyToTaskReminder(text);            
         }
     }
-
     private IEnumerator ReminderCoroutine(float delay)
     {
         yield return new WaitForSeconds(delay);
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
-            (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReadyToTaskReminder();
-        }
-        else
-        {
-            Debug.LogError("UIManager instance is null in TaskPanel.ReminderCoroutine");
-        }
     }
 
     private void CancelReminderTimer()

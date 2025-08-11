@@ -12,3 +12,8 @@ public enum PackageMode
 {
     normal, delete, sort,
 }
+
+public enum ErrorCode
+{
+    ErrorNull,
+}

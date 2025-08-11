@@ -21,9 +21,9 @@ public class PackageLocalData
 
     public void SavePackage()
     {
-        string inventoryJson = JsonUtility.ToJson(this);
-        PlayerPrefs.SetString("PackageLocalData", inventoryJson);
-        PlayerPrefs.Save();
+        string json = JsonUtility.ToJson(this);
+        PlayerPrefs.SetString("PackageLocalData", json);
+        PlayerPrefs.Save();        
     }
 
     public List<PackageLocalItem> LoadPackage()
@@ -34,8 +34,8 @@ public class PackageLocalData
         }
         if (PlayerPrefs.HasKey("PackageLocalData"))
         {
-            string inventoryJson = PlayerPrefs.GetString("PackageLocalData");
-            PackageLocalData packageLocalData = JsonUtility.FromJson<PackageLocalData>(inventoryJson);
+            string json = PlayerPrefs.GetString("PackageLocalData");
+            PackageLocalData packageLocalData = JsonUtility.FromJson<PackageLocalData>(json);
             packageLocalItems = packageLocalData.packageLocalItems;
             return packageLocalItems;
         }

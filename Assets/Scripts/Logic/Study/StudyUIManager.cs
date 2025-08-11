@@ -19,7 +19,6 @@ public class StudyUIManager : MonoBehaviour
     {
         EventHandler.StudyTimeUpdatedEvent += OnStudyTimeUpdatedEvent;
     }
-
     private void OnDisable()
     {
         EventHandler.StudyTimeUpdatedEvent -= OnStudyTimeUpdatedEvent;
@@ -27,7 +26,7 @@ public class StudyUIManager : MonoBehaviour
 
     private void Start()
     {
-        OnStudyTimeUpdatedEvent(TaskSystem.Instance.remainingStudyTime);
+        OnStudyTimeUpdatedEvent(TaskManager.Instance.remainingStudyTime);
 
         pauseButton.onClick.AddListener(OnPauseButtonClicked);
         continueButton.onClick.AddListener(OnContinueButtonClicked);
@@ -49,20 +48,20 @@ public class StudyUIManager : MonoBehaviour
         remainingTimeText.text = $"Remaing: {minutes:00}:{seconds:00}";
 
         // Update session time display
-        int sessionMinutes = Mathf.FloorToInt(TaskSystem.Instance.currentSessionTime / 60);
+        int sessionMinutes = Mathf.FloorToInt(TaskManager.Instance.currentSessionTime / 60);
         sessionTimeText.text = $"Session: {sessionMinutes} min";
     }
 
     private void OnPauseButtonClicked()
     {
-        TaskSystem.Instance.PauseStudy();
+        TaskManager.Instance.PauseStudy();
         pauseButton.gameObject.SetActive(false);
         continueButton.gameObject.SetActive(true);
     }
 
     private void OnContinueButtonClicked()
     {
-        TaskSystem.Instance.ResumeStudy();
+        TaskManager.Instance.ResumeStudy();
         continueButton.gameObject.SetActive(false);
         pauseButton.gameObject.SetActive(true);
     }

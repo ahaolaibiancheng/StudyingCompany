@@ -10,7 +10,6 @@ public class ReminderPanel : BasePanel
     public Button cancelButton;
     public Text reminderMessage;
 
-    private TaskSystem taskSystem;
     protected override void Awake()
     {
         base.Awake();
@@ -22,14 +21,11 @@ public class ReminderPanel : BasePanel
         confirmStartButton.onClick.AddListener(OnConfirmStartClicked);
         delayButton.onClick.AddListener(OnDelayClicked);
         cancelButton.onClick.AddListener(OnCancelClicked);
-
-        taskSystem = TaskSystem.Instance;
     }
 
-    public void ShowReadyToTaskReminder()
+    public void ShowReadyToTaskReminder(string text)
     {
-        reminderMessage.text = "任务即将开始，请做好准备！";
-        // UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
+        reminderMessage.text = text;
     }
 
     public void ShowTaskEndReminder()
@@ -50,7 +46,7 @@ public class ReminderPanel : BasePanel
     private void OnConfirmStartClicked()
     {
         UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
-        taskSystem.ConfirmTaskStart(); // 用户确认开始任务
+        TaskManager.Instance.ConfirmTaskStart(); // 用户确认开始任务
     }
 
     private void OnDelayClicked()

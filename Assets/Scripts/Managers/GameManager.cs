@@ -29,8 +29,8 @@ public class GameManager : MonoBehaviour
 
     private void InitializeGame()
     {
-        Debug.Log("游戏开始");
-        SetCharacterState(CharacterState.Studying);
+        // Debug.Log("游戏开始");
+        SetCharacterState(CharacterState.Idle);
     }
 
     public void SetCharacterState(CharacterState newState)
@@ -49,7 +49,7 @@ public class GameManager : MonoBehaviour
         {
             // 退出学习状态时返回Home场景
             // SceneManager.LoadScene("Home");
-            // TransitionManager.Instance.Transtion("Study", "Home");
+            TransitionManager.Instance.Transtion("Study", "Home");
         }
 
         // 保存旧状态
@@ -72,7 +72,7 @@ public class GameManager : MonoBehaviour
                     if (previousState != CharacterState.Studying)
                     {
                         Debug.Log("开始学习会话");
-                        StartCoroutine(TaskSystem.Instance.StudySession());
+                        StartCoroutine(TaskManager.Instance.StudySession());
                     }
                     break;
                 case CharacterState.Resting:

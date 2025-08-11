@@ -5,7 +5,6 @@ public class PetController : MonoBehaviour
     public static PetController Instance;
     private Animator animator;
     private GameManager gameManager;
-    private TaskSystem taskSystem;
 
     // Animation parameters
     private const string IDLE_PARAM = "IsIdle";
