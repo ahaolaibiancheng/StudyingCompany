@@ -102,6 +102,10 @@ public class CursorManager : MonoBehaviour
                 var egg = clickObject.GetComponent<Egg>();
                 egg?.OnEggIsTriggered();
                 break;
+            case "Tomato":
+                var todoListUI = clickObject.GetComponent<Egg>();
+                todoListUI?.OnTomatoIsTriggered();
+                break;
         }
     }
 
@@ -114,7 +118,7 @@ public class CursorManager : MonoBehaviour
             ClickAction(GetObjectWorldPosition().gameObject);
         }
 
-        if (InteractWithUI()) return;   // 检测鼠标是否处于UI上，若是，则不响应点击事件
+        // if (InteractWithUI()) return;   // 检测鼠标是否处于UI上，若是，则不响应点击事件
 
         // if (hand.gameObject.activeInHierarchy)
         // {

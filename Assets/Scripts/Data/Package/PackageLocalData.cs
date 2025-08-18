@@ -52,6 +52,7 @@ public class PackageLocalItem
 {
     public string uid;  // 物品唯一标识符
     public int id;  // 物品ID（对应配置表中的ID）
+    public int type;
     public int num;
     public int level;
     public bool isNew;

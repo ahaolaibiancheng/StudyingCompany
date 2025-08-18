@@ -17,3 +17,8 @@ public enum ErrorCode
 {
     ErrorNull,
 }
+
+public enum PetItemsType
+{
+    Food, Dress
+}

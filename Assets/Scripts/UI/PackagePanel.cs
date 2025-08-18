@@ -121,8 +121,8 @@ public class PackagePanel : BasePanel
         UICenter = transform.Find("PackagePanel/Center");
         UIScrollView = transform.Find("PackagePanel/Center/Scroll View");
         UIDetailPanel = transform.Find("PackagePanel/Center/DetailPanel");
-        // UILeftBtn = transform.Find("PackagePanel/Left/Button");
-        // UIRightBtn = transform.Find("PackagePanel/Right/Button");
+        UILeftBtn = transform.Find("PackagePanel/Left/Button");
+        UIRightBtn = transform.Find("PackagePanel/Right/Button");
 
         UIDeletePanel = transform.Find("PackagePanel/Bottom/DeletePanel");
         UIDeleteBackBtn = transform.Find("PackagePanel/Bottom/DeletePanel/Back");
@@ -141,8 +141,8 @@ public class PackagePanel : BasePanel
         UIMenuDress.GetComponent<Button>().onClick.AddListener(OnClickDress);
         UIMenuFood.GetComponent<Button>().onClick.AddListener(OnClickFood);
         UICloseBtn.GetComponent<Button>().onClick.AddListener(OnClickClose);
-        // UILeftBtn.GetComponent<Button>().onClick.AddListener(OnClickLeft);
-        // UIRightBtn.GetComponent<Button>().onClick.AddListener(OnClickRight);
+        UILeftBtn.GetComponent<Button>().onClick.AddListener(OnClickLeft);
+        UIRightBtn.GetComponent<Button>().onClick.AddListener(OnClickRight);
 
         // UIDeleteBackBtn.GetComponent<Button>().onClick.AddListener(OnDeleteBack);
         // UIDeleteConfirmBtn.GetComponent<Button>().onClick.AddListener(OnDeleteConfirm);
