@@ -21,9 +21,17 @@ public class Egg : MonoBehaviour
 
     public void OnTomatoIsTriggered()
     {
-        Transform configPanel = GameObject.Find("Canvas1").transform;
-        if (configPanel == null) return;
+        Transform canvas = GameObject.Find("TomatolCanvas").transform;
+        if (canvas == null) return;
 
-        configPanel.transform.GetChild(0).gameObject.SetActive(true);
+        canvas.transform.GetChild(0).gameObject.SetActive(true);
+    }
+
+    public void OnTodoListIsTriggered()
+    {
+        Transform canvas = GameObject.Find("TodoListCanvas").transform;
+        if (canvas == null) return;
+
+        canvas.transform.GetChild(0).gameObject.SetActive(true);
     }
 }

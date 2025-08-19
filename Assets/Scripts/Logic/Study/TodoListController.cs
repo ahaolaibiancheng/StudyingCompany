@@ -1,102 +1,82 @@
+using System.Collections.Generic;
 using UnityEngine;
+using System.IO;
 using System;
+
+[System.Serializable]
+public class TodoItem
+{
+    public string content;
+    public bool isImportant;
+    public bool isUrgent;
+    public DateTime dueDate;
+    public bool isCompleted;
+    public int sortOrder; // 用于任务排序
+}
 
 public class TodoListController : MonoBehaviour
 {
-    // 用户配置参数
-    public float focusDuration = 25f * 60f;  // 专注时长（秒）
-    public float breakDuration = 5f * 60f;   // 休息时长（秒）
-    public int targetCycles = 4;             // 目标周期数
-    
-    // 运行时状态
-    private float currentTime;
-    private int completedCycles;
-    private bool isFocusPhase;
-    private bool isActive;
-    
-    public event Action OnFocusStart;
-    public event Action OnBreakStart;
-    public event Action OnCycleComplete;
-    public event Action OnTimerCancel;
-    
-    void Start()
+    public List<TodoItem> importantUrgent = new List<TodoItem>();
+    public List<TodoItem> notImportantUrgent = new List<TodoItem>();
+    public List<TodoItem> importantNotUrgent = new List<TodoItem>();
+    public List<TodoItem> notImportantNotUrgent = new List<TodoItem>();
+
+    private string savePath;
+
+    void Awake()
     {
-        ResetTimer();
+        savePath = Path.Combine(Application.persistentDataPath, "todoList.json");
+        LoadTodoList();
     }
-    
-    public void ResetTimer()
+
+    public void AddTodoItem(TodoItem item)
     {
-        currentTime = focusDuration;
-        completedCycles = 0;
-        isFocusPhase = true;
-        isActive = false;
-    }
-    
-    public void StartTimer()
-    {
-        isActive = true;
-        if (isFocusPhase) OnFocusStart?.Invoke();
-        else OnBreakStart?.Invoke();
-    }
-    
-    public void CancelTimer()
-    {
-        isActive = false;
-        OnTimerCancel?.Invoke();
-    }
-    
-    public void ConfirmPhaseCompletion()
-    {
-        if (!isActive) return;
-        
-        if (isFocusPhase)
-        {
-            // 专注结束，开始休息
-            isFocusPhase = false;
-            currentTime = breakDuration;
-            OnBreakStart?.Invoke();
-        }
+        if (item.isImportant && item.isUrgent)
+            importantUrgent.Add(item);
+        else if (!item.isImportant && item.isUrgent)
+            notImportantUrgent.Add(item);
+        else if (item.isImportant && !item.isUrgent)
+            importantNotUrgent.Add(item);
         else
+            notImportantNotUrgent.Add(item);
+        
+        SaveTodoList();
+    }
+
+    public void SaveTodoList()
+    {
+        TodoListData data = new TodoListData
         {
-            // 休息结束，完成一个周期
-            isFocusPhase = true;
-            currentTime = focusDuration;
-            completedCycles++;
-            OnCycleComplete?.Invoke();
-            
-            // 开始下一个专注周期
-            OnFocusStart?.Invoke();
+            importantUrgent = this.importantUrgent,
+            notImportantUrgent = this.notImportantUrgent,
+            importantNotUrgent = this.importantNotUrgent,
+            notImportantNotUrgent = this.notImportantNotUrgent
+        };
+
+        string json = JsonUtility.ToJson(data, true);
+        File.WriteAllText(savePath, json);
+    }
+
+    public void LoadTodoList()
+    {
+        if (File.Exists(savePath))
+        {
+            string json = File.ReadAllText(savePath);
+            TodoListData data = JsonUtility.FromJson<TodoListData>(json);
+
+            importantUrgent = data.importantUrgent ?? new List<TodoItem>();
+            notImportantUrgent = data.notImportantUrgent ?? new List<TodoItem>();
+            importantNotUrgent = data.importantNotUrgent ?? new List<TodoItem>();
+            notImportantNotUrgent = data.notImportantNotUrgent ?? new List<TodoItem>();
         }
     }
-    
-    void Update()
+
+    [System.Serializable]
+    private class TodoListData
     {
-        if (!isActive) return;
-        
-        currentTime -= Time.deltaTime;
-        
-        if (currentTime <= 0)
-        {
-            // 当前阶段时间结束
-            isActive = false;
-        }
+        public List<TodoItem> importantUrgent;
+        public List<TodoItem> notImportantUrgent;
+        public List<TodoItem> importantNotUrgent;
+        public List<TodoItem> notImportantNotUrgent;
     }
-    
-    // 获取当前进度百分比 (0-1)
-    public float GetProgress()
-    {
-        float total = isFocusPhase ? focusDuration : breakDuration;
-        return 1 - (currentTime / total);
-    }
-    
-    // 获取当前阶段剩余时间（格式化）
-    public string GetCurrentTimeFormatted()
-    {
-        TimeSpan time = TimeSpan.FromSeconds(currentTime);
-        return $"{time.Minutes:00}:{time.Seconds:00}";
-    }
-    
-    public int GetCompletedCycles() => completedCycles;
-    public bool IsFocusPhase() => isFocusPhase;
-    public bool IsActive() => isActive;
 }

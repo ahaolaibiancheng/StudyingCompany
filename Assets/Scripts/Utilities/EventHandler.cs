@@ -31,3 +31,29 @@ public static class EventHandler
         StudyEndEvent?.Invoke();
     }
 }
+
+public static class ToolEventHandler
+{
+
+    public static event Action ToolFocusStartEvent;
+    public static void CallToolFocusStartEvent()
+    {
+        ToolFocusStartEvent?.Invoke();
+    }
+    public static event Action ToolBreakStartEvent;
+    public static void CallToolBreakStartEvent()
+    {
+        ToolBreakStartEvent?.Invoke();
+    }
+    public static event Action ToolCycleCompleteEvent;
+    public static void CallToolCycleCompleteEvent()
+    {
+        ToolCycleCompleteEvent?.Invoke();
+    }
+    public static event Action ToolTimerCancelEvent;
+    public static void CallToolTimerCancelEvent()
+    {
+        ToolTimerCancelEvent?.Invoke();
+    }
+
+}
