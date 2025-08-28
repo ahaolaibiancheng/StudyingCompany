@@ -55,13 +55,7 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         
         background.color = todoItem.isCompleted ? 
             new Color(0.9f, 0.9f, 0.9f) :  // 完成时浅灰背景
-            new Color(1f, 1f, 1f);          // 未完成时白色背景
-            
-        // 设置文本删除线效果
-        contentText.fontStyle = todoItem.isCompleted ? 
-            FontStyles.Strikethrough : FontStyles.Normal;
-        dueDateText.fontStyle = todoItem.isCompleted ? 
-            FontStyles.Strikethrough : FontStyles.Normal;   
+            new Color(1f, 1f, 1f);          // 未完成时白色背景       
     }
 
     private void OnToggleChanged(bool isCompleted)
@@ -182,20 +176,9 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             placeholder = null;
         }
         
-        // 查找最近的分类容器
-        Transform closestContainer = FindClosestContainer();
-        if (closestContainer != null && closestContainer != transform.parent)
-        {
-            transform.SetParent(closestContainer);
-            onMoved?.Invoke(todoItem, closestContainer);
-        }
-        else
-        {
-            // 更新排序顺序
-            transform.SetSiblingIndex(startSiblingIndex);
-            todoItem.sortOrder = transform.GetSiblingIndex();
-            onCompleted?.Invoke(todoItem);
-        }
+        // 更新排序顺序
+        transform.SetSiblingIndex(startSiblingIndex);
+        todoItem.sortOrder = transform.GetSiblingIndex();
         
         background.color = todoItem.isCompleted ? 
             new Color(0.8f, 0.8f, 0.8f) : 
@@ -209,31 +192,5 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         {
             TodoListUI.Instance.HideDeleteArea();
         }
-    }
-
-    private Transform FindClosestContainer()
-    {
-        Transform[] containers = {
-            transform.parent, // 当前容器
-            TodoListUI.Instance.importantUrgentContainer,
-            TodoListUI.Instance.notImportantUrgentContainer,
-            TodoListUI.Instance.importantNotUrgentContainer,
-            TodoListUI.Instance.notImportantNotUrgentContainer
-        };
-
-        Transform closest = transform.parent;
-        float minDistance = float.MaxValue;
-
-        foreach (Transform container in containers)
-        {
-            float distance = Vector3.Distance(transform.position, container.position);
-            if (distance < minDistance)
-            {
-                minDistance = distance;
-                closest = container;
-            }
-        }
-
-        return closest;
     }
 }
