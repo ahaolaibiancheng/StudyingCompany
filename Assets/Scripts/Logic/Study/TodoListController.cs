@@ -9,9 +9,24 @@ public class TodoItem
     public string content;
     public bool isImportant;
     public bool isUrgent;
-    public DateTime dueDate;
+    public string dueDateString; // 使用字符串存储日期，避免DateTime序列化问题
     public bool isCompleted;
     public int sortOrder; // 用于任务排序
+
+    // 属性用于访问DateTime值
+    public DateTime dueDate
+    {
+        get
+        {
+            if (DateTime.TryParse(dueDateString, out DateTime result))
+                return result;
+            return DateTime.Now.AddDays(7); // 默认7天后
+        }
+        set
+        {
+            dueDateString = value.ToString("yyyy-MM-dd");
+        }
+    }
 }
 
 public class TodoListController : MonoBehaviour

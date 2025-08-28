@@ -5,7 +5,7 @@ public enum CharacterState
 
 public enum PetState
 {
-    Idle, Wrming, Eating
+    Idle, Dressing, Eating, Reminding, Walking, Reading
 }
 
 public enum PackageMode

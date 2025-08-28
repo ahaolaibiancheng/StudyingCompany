@@ -7,7 +7,6 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
-    public CharacterState currentState;
 
     private void Awake()
     {
@@ -20,91 +19,10 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        InitializeGame();
     }
     private void Start()
     {
         // Debug.Log("Screen.width/height: " + Screen.width + "/" + Screen.height);
-    }
-
-    private void InitializeGame()
-    {
-        // Debug.Log("游戏开始");
-        SetCharacterState(CharacterState.Idle);
-    }
-
-    public void SetCharacterState(CharacterState newState)
-    {
-        Debug.Log($"SetCharacterState: {currentState} -> {newState}");
-        if (currentState == newState) return;
-
-        // 处理场景切换
-        if (newState == CharacterState.Studying && currentState != CharacterState.Studying)
-        {
-            // 进入学习状态时切换到Studying场景
-            // SceneManager.LoadScene("Studying");
-            TransitionManager.Instance.Transtion("Home", "Study");
-        }
-        else if (newState == CharacterState.Idle && currentState == CharacterState.Studying)
-        {
-            // 退出学习状态时返回Home场景
-            // SceneManager.LoadScene("Home");
-            TransitionManager.Instance.Transtion("Study", "Home");
-        }
-
-        // 保存旧状态
-        CharacterState previousState = currentState;
-        currentState = newState;
-
-        // 只在状态真正改变时触发事件
-        if (previousState != newState)
-        {
-            EventHandler.CallCharacterStateChangedEvent(newState);
-        }
-
-        // 避免在Idle状态重复触发
-        if (newState != CharacterState.Idle)
-        {
-            switch (newState)
-            {
-                case CharacterState.Studying:
-                    // 确保不在同一个状态下重复启动协程
-                    if (previousState != CharacterState.Studying)
-                    {
-                        Debug.Log("开始学习会话");
-                        StartCoroutine(TaskManager.Instance.StudySession());
-                    }
-                    break;
-                case CharacterState.Resting:
-                    // 确保不在同一个状态下重复启动协程
-                    if (previousState != CharacterState.Resting)
-                    {
-                        Debug.Log("开始休息会话");
-                        StartCoroutine(RestSession());
-                    }
-                    break;
-            }
-        }
-    }
-
-    private IEnumerator RestSession()
-    {
-        Debug.Log("RestSession 开始");
-        float restTime = 0f;
-        float maxRestTime = 5 * 60; // 5 minutes in seconds
-
-        while (currentState == CharacterState.Resting && restTime < maxRestTime)
-        {
-            restTime += Time.deltaTime;
-            yield return null;
-        }
-
-        // Return to studying after rest
-        if (currentState == CharacterState.Resting)
-        {
-            SetCharacterState(CharacterState.Studying);
-        }
-        Debug.Log("RestSession 结束");
     }
 
     private PackageTable packageTable;

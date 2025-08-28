@@ -16,7 +16,7 @@ public class TaskManager : MonoBehaviour
     private Coroutine reminderCoroutine; // 存储协程引用
     private DateTime taskStartTime;
     private DateTime taskEndTime;
-    private bool isStudyPaused = false;
+    private ReminderPanel reminderPanel;
 
 
     private void Awake()
@@ -149,7 +149,7 @@ public class TaskManager : MonoBehaviour
     private IEnumerator WaitForTaskStart(float delay)
     {
         yield return new WaitForSeconds(delay);
-        GameManager.Instance.SetCharacterState(CharacterState.Studying);
+        // CharacterState logic removed
     }
 
     private void CancelStartTaskWait()
@@ -181,7 +181,7 @@ public class TaskManager : MonoBehaviour
         if (DateTime.Now >= taskStartTime)
         {
             // 如果已经过了开始时间，立即开始
-            GameManager.Instance.SetCharacterState(CharacterState.Studying);
+            // CharacterState logic removed
         }
         else
         {
@@ -212,9 +212,8 @@ public class TaskManager : MonoBehaviour
         }
         else
         {
-            UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
             string text = "任务开始时间不足5分钟，立即提醒";
-            (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReadyToTaskReminder(text);            
+            reminderPanel.ShowReminderMessage(text);          
         }
     }
     private IEnumerator ReminderCoroutine(float delay)
@@ -231,47 +230,44 @@ public class TaskManager : MonoBehaviour
         }
     }
 
-    public IEnumerator StudySession()
-    {
-        Debug.Log("StudySession 开始");
-        isStudyPaused = false;
+    // public IEnumerator StudySession()
+    // {
+    //     Debug.Log("StudySession 开始");
+    //     isStudyPaused = false;
 
-        // 不再重置 currentSessionTime，而是持续累加
-        while (GameManager.Instance.currentState == CharacterState.Studying)
-        {
-            if (!isStudyPaused)
-            {
-                currentSessionTime += Time.deltaTime;
-                remainingStudyTime -= Time.deltaTime;
+    //     // 不再重置 currentSessionTime，而是持续累加
+    //     while (true)
+    //     {
+    //         if (!isStudyPaused)
+    //         {
+    //             currentSessionTime += Time.deltaTime;
+    //             remainingStudyTime -= Time.deltaTime;
 
-                // Debug.Log($"更新学习时间: session={currentSessionTime}, remaining={remainingStudyTime}");
-                EventHandler.CallStudyTimeUpdatedEvent(remainingStudyTime);
+    //             // Debug.Log($"更新学习时间: session={currentSessionTime}, remaining={remainingStudyTime}");
+    //             EventHandler.CallStudyTimeUpdatedEvent(remainingStudyTime);
 
-                // 检查学习时间是否结束
-                if (remainingStudyTime <= 0)
-                {
-                    Debug.Log("学习时间结束");
-                    PetController.Instance.TriggerReminder();
-                }
+    //             // 检查学习时间是否结束
+    //             if (remainingStudyTime <= 0)
+    //             {
+    //                 Debug.Log("学习时间结束");
+    //                 PetController.Instance.TriggerReminder();
+    //             }
 
-                // 检查任务时间是否结束
-                if (DateTime.Now >= taskEndTime)
-                {
-                    Debug.Log("任务时间结束");
-                    CompleteTask(); // 调用任务完成方法
-                    yield break;
-                }
-            }
-            yield return null;
-        }
-        Debug.Log("StudySession 结束 - 状态已改变");
-    }
+    //             // 检查任务时间是否结束
+    //             if (DateTime.Now >= taskEndTime)
+    //             {
+    //                 Debug.Log("任务时间结束");
+    //                 CompleteTask(); // 调用任务完成方法
+    //                 yield break;
+    //             }
+    //         }
+    //         yield return null;
+    //     }
+    //     Debug.Log("StudySession 结束 - 状态已改变");
+    // }
 
     public void CompleteTask()
     {
-        // InventorySystem.Instance.AddRandomItem();
-        GameManager.Instance.SetCharacterState(CharacterState.Idle);
-
         // 完成任务时重置累计时间
         currentSessionTime = 0f;
 
@@ -284,16 +280,6 @@ public class TaskManager : MonoBehaviour
         // Reward player with random item
         UIManager.Instance.OpenPanel(UIConst.RewardPanel);
         EventHandler.CallStudyEndEvent();
-    }
-
-    public void PauseStudy()
-    {
-        isStudyPaused = true;
-    }
-
-    public void ResumeStudy()
-    {
-        isStudyPaused = false;
     }
 
 }

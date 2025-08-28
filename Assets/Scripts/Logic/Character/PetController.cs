@@ -1,27 +1,27 @@
 using UnityEngine;
+using System.Collections;
 
 public class PetController : MonoBehaviour
 {
     public static PetController Instance;
     private Animator animator;
     private GameManager gameManager;
-
-    // Animation parameters
-    private const string IDLE_PARAM = "IsIdle";
-    private const string EATING_PARAM = "IsEating";
-    private const string DRESSING_PARAM = "IsDressing";
-    private const string REMINDING_PARAM = "IsReminding";
-
     private float reminderInterval = 300f; // 5 minutes in seconds
     private float lastReminderTime;
     private bool isReminding = false;
+
+    private const int CAT_IDLE_PARAM = 0;
+    private const int CAT_EAT_PARAM = 1;
+    private const int CAT_DRESS_PARAM = 2;
+    private const int CAT_REMIND_PARAM = 3;
+    private const int CAT_WALK_PARAM = 4;
+    private const int CAT_READ_PARAM = 5;
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
         }
         else if (Instance != this)
         {
@@ -30,48 +30,62 @@ public class PetController : MonoBehaviour
 
         animator = GetComponent<Animator>();
         gameManager = GameManager.Instance;
+        // reminderPanel should be assigned via Unity Inspector, not GetComponent
     }
 
     private void Start()
     {
-        SetPetState(IDLE_PARAM);
+        SetPetState(PetState.Reading);
     }
 
     private void OnEnable()
     {
-        EventHandler.CharacterStateChangedEvent += OnCharacterStateChangedEvent;
         EventHandler.StudyTimeUpdatedEvent += OnStudyTimeUpdatedEvent;
+        ToolEventHandler.ToolBreakStartEvent += () => StartCoroutine(OnFocusTimeEnd());
+        ToolEventHandler.ToolCycleCompleteEvent += () => StartCoroutine(OnBreakTimeEnd());
     }
 
     private void OnDisable()
     {
-        EventHandler.CharacterStateChangedEvent += OnCharacterStateChangedEvent;
         EventHandler.StudyTimeUpdatedEvent -= OnStudyTimeUpdatedEvent;
-    }
-
-    private void OnCharacterStateChangedEvent(CharacterState newState)
-    {
-        if (newState == CharacterState.Idle)
-        {
-            SetPetState(IDLE_PARAM);
-        }
-        else if (newState == CharacterState.Studying && isReminding)
-        {
-            // Stop reminding when study resumes
-            SetPetState(IDLE_PARAM);
-            isReminding = false;
-        }
+        ToolEventHandler.ToolBreakStartEvent -= () => StartCoroutine(OnFocusTimeEnd());
+        ToolEventHandler.ToolCycleCompleteEvent -= () => StartCoroutine(OnBreakTimeEnd());
     }
 
     private void OnStudyTimeUpdatedEvent(float remainingTime)
     {
         // Trigger reminder when study time is up and not already reminding
-        if (remainingTime <= 0 && !isReminding && gameManager.currentState == CharacterState.Studying)
+        if (remainingTime <= 0 && !isReminding)
         {
             TriggerReminder();
         }
     }
+    private IEnumerator OnFocusTimeEnd()
+    {
+        SetPetState(PetState.Reminding);
 
+        UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
+        (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReminderMessage("该休息了");  
+        // 等待5秒后关闭面板
+        yield return new WaitForSeconds(5);
+        UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
+
+        yield return new WaitForSeconds(3f);
+        SetPetState(PetState.Idle);
+    }
+    private IEnumerator OnBreakTimeEnd()
+    {
+        SetPetState(PetState.Reminding);
+
+        UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
+        (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReminderMessage("该学习了");  
+        // 等待5秒后关闭面板
+        yield return new WaitForSeconds(5);
+        UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
+
+        yield return new WaitForSeconds(3f);
+        SetPetState(PetState.Reading);
+    }
     private void Update()
     {
         // Handle periodic reminders
@@ -81,67 +95,64 @@ public class PetController : MonoBehaviour
         }
     }
 
+
     public void TriggerReminder()
     {
-        if (gameManager.currentState != CharacterState.Studying) return;
-
-        SetPetState(REMINDING_PARAM);
+        SetPetState(PetState.Reminding);
         isReminding = true;
         lastReminderTime = Time.time;
     }
 
-    // Called when user feeds the pet
-    public void FeedPet()
+    private void SetPetState(PetState state)
     {
-        if (gameManager.currentState == CharacterState.Resting)
+        // Set the active state based on PetState
+        Debug.Log("SetPetState: " + state);
+        switch (state)
         {
-            SetPetState(EATING_PARAM);
+            case PetState.Idle:
+                animator.SetInteger("petState", CAT_IDLE_PARAM);
+                break;
+            case PetState.Eating:
+                animator.SetInteger("petState", CAT_EAT_PARAM);
+                break;
+            case PetState.Dressing:
+                animator.SetInteger("petState", CAT_DRESS_PARAM);
+                break;
+            case PetState.Reminding:
+                animator.SetInteger("petState", CAT_REMIND_PARAM);
+                break;
+            case PetState.Walking:
+                animator.SetInteger("petState", CAT_WALK_PARAM);
+                break;
+            case PetState.Reading:
+                animator.SetInteger("petState", CAT_READ_PARAM);
+                break;
         }
-    }
-
-    // Called when user dresses the pet
-    public void DressPet()
-    {
-        if (gameManager.currentState == CharacterState.Resting)
-        {
-            SetPetState(DRESSING_PARAM);
-        }
-    }
-
-    private void SetPetState(string stateParam)
-    {
-        // Reset all animation parameters
-        animator.SetBool(IDLE_PARAM, false);
-        animator.SetBool(EATING_PARAM, false);
-        animator.SetBool(DRESSING_PARAM, false);
-        animator.SetBool(REMINDING_PARAM, false);
-
-        // Set the active state
-        animator.SetBool(stateParam, true);
     }
 
     // Animation event handlers
-    public void OnEatingComplete()
+    public void OnEatingCompleted()
     {
-        if (animator.GetBool(EATING_PARAM))
-        {
-            SetPetState(IDLE_PARAM);
-        }
+        if (animator.GetInteger("petState") != CAT_EAT_PARAM) return;
+        SetPetState(PetState.Idle);
     }
 
-    public void OnDressingComplete()
+    public void OnDressingCompleted()
     {
-        if (animator.GetBool(DRESSING_PARAM))
-        {
-            SetPetState(IDLE_PARAM);
-        }
+        if (animator.GetInteger("petState") != CAT_DRESS_PARAM) return;
+        SetPetState(PetState.Idle);
     }
 
-    public void OnRemindingComplete()
+    public void OnRemindingCompleted()
     {
-        if (animator.GetBool(REMINDING_PARAM))
+        if (animator.GetInteger("petState") != CAT_REMIND_PARAM) return;
+        if (TomatoController.Instance?.IsFocusPhase() == true)
         {
-            SetPetState(IDLE_PARAM);
+            SetPetState(PetState.Reading);
+        }
+        else
+        {
+            SetPetState(PetState.Idle);
         }
     }
 }

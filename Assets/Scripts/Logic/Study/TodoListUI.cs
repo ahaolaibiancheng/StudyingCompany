@@ -41,6 +41,11 @@ public class TodoListUI : MonoBehaviour
     public Button addTaskButton;
     public Button closeButton;
 
+    [Header("Delete Area")]
+    public RectTransform deleteArea;
+    public Image deleteAreaImage;
+    public Text deleteAreaText;
+
     private TodoListController todoController;
 
     void Awake()
@@ -68,6 +73,20 @@ public class TodoListUI : MonoBehaviour
         // 默认显示重要且紧急分类
         ShowCategory(importantUrgentContainer, "重要且紧急");
         addTaskPanel.SetActive(false);
+
+        // 初始化删除区域 - 默认隐藏
+        if (deleteArea != null)
+        {
+            deleteArea.gameObject.SetActive(false);
+            if (deleteAreaImage != null)
+            {
+                deleteAreaImage.color = new Color(1f, 0.5f, 0.5f, 0.3f); // 半透明红色背景
+            }
+            if (deleteAreaText != null)
+            {
+                deleteAreaText.text = "拖拽至此删除";
+            }
+        }
 
         LoadTodoItems();
     }
@@ -154,7 +173,7 @@ public class TodoListUI : MonoBehaviour
 
         GameObject taskItem = Instantiate(taskItemPrefab, parent);
         TaskItemUI itemUI = taskItem.GetComponent<TaskItemUI>();
-        itemUI.Initialize(item, OnTaskCompleted, OnTaskMoved);
+        itemUI.Initialize(item, OnTaskCompleted, OnTaskMoved, OnTaskDeleted, deleteArea);
     }
 
     private void ClearAllContainers()
@@ -208,11 +227,29 @@ public class TodoListUI : MonoBehaviour
         LoadTodoItems();
     }
 
+    private void OnTaskDeleted(TodoItem item)
+    {
+        // 从控制器中移除任务
+        RemoveItemFromController(item);
+        todoController.SaveTodoList();
+    }
+
     private void RemoveItemFromController(TodoItem item)
     {
         todoController.importantUrgent.Remove(item);
         todoController.notImportantUrgent.Remove(item);
         todoController.importantNotUrgent.Remove(item);
         todoController.notImportantNotUrgent.Remove(item);
+    }
+
+    public void ShowDeleteArea()
+    {
+        deleteArea.gameObject.SetActive(true);
+        deleteAreaText.text = "拖拽至此删除";
+    }
+
+    public void HideDeleteArea()
+    {
+        deleteArea.gameObject.SetActive(false);
     }
 }

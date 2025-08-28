@@ -91,7 +91,7 @@ public class TaskPanel : BasePanel
             {
                 UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
                 string text = "结束时间不能早于开始时间或早于当前时间";
-                (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReadyToTaskReminder(text); 
+                (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReminderMessage(text); 
                 return;
             }
 

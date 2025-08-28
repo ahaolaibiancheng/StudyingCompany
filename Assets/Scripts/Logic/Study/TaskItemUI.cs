@@ -14,18 +14,23 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private TodoItem todoItem;
     private Action<TodoItem> onCompleted;
     private Action<TodoItem, Transform> onMoved;
+    private Action<TodoItem> onDelete;
     
     // Drag and drop variables
     private RectTransform parentRect;
     private int startSiblingIndex;
     private GameObject placeholder;
-    private bool isDragging = false;
+    // private bool isDragging = false;
+    private bool isOverDeleteArea = false;
+    private RectTransform deleteAreaRect;
 
-    public void Initialize(TodoItem item, Action<TodoItem> completedCallback, Action<TodoItem, Transform> movedCallback)
+    public void Initialize(TodoItem item, Action<TodoItem> completedCallback, Action<TodoItem, Transform> movedCallback, Action<TodoItem> deleteCallback = null, RectTransform deleteArea = null)
     {
         todoItem = item;
         onCompleted = completedCallback;
         onMoved = movedCallback;
+        onDelete = deleteCallback;
+        deleteAreaRect = deleteArea;
         
         contentText.text = item.content;
         dueDateText.text = item.dueDate.ToString("yyyy-MM-dd");
@@ -84,14 +89,45 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         background.color = new Color(0.9f, 0.9f, 1f);
         // Set as last sibling to draw on top
         transform.SetAsLastSibling();
+
+        // Show delete area when dragging starts
+        if (TodoListUI.Instance != null)
+        {
+            TodoListUI.Instance.ShowDeleteArea();
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         transform.position = eventData.position;
         
+        // Check if over delete area
+        if (deleteAreaRect != null)
+        {
+            bool wasOverDeleteArea = isOverDeleteArea;
+            isOverDeleteArea = RectTransformUtility.RectangleContainsScreenPoint(deleteAreaRect, eventData.position, null);
+            
+            if (isOverDeleteArea != wasOverDeleteArea)
+            {
+                // Update appearance to indicate delete state
+                background.color = isOverDeleteArea ? 
+                    new Color(1f, 0.5f, 0.5f) : // Red tint for delete
+                    new Color(0.9f, 0.9f, 1f);   // Normal drag color
+
+                // If just entered delete area, update delete area text
+                if (isOverDeleteArea && !wasOverDeleteArea && TodoListUI.Instance != null && TodoListUI.Instance.deleteAreaText != null)
+                {
+                    TodoListUI.Instance.deleteAreaText.text = "松开删除";
+                }
+                else if (!isOverDeleteArea && wasOverDeleteArea && TodoListUI.Instance != null && TodoListUI.Instance.deleteAreaText != null)
+                {
+                    TodoListUI.Instance.deleteAreaText.text = "拖拽至此删除";
+                }
+            }
+        }
+        
         // Update placeholder position for sorting
-        if (placeholder != null)
+        if (placeholder != null && !isOverDeleteArea)
         {
             int newSiblingIndex = transform.parent.childCount;
             
@@ -116,6 +152,29 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        // If the item was deleted during drag, we don't need to do anything here
+        if (this == null) return;
+        
+        // Check if over delete area and delete if true
+        if (isOverDeleteArea && onDelete != null)
+        {
+            onDelete?.Invoke(todoItem);
+            // Clean up placeholder
+            if (placeholder != null)
+            {
+                Destroy(placeholder);
+                placeholder = null;
+            }
+            Destroy(gameObject);
+            
+            // Hide delete area after deletion
+            if (TodoListUI.Instance != null)
+            {
+                TodoListUI.Instance.HideDeleteArea();
+            }
+            return; // Stop further processing
+        }
+        
         // Clean up placeholder
         if (placeholder != null)
         {
@@ -133,7 +192,7 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         else
         {
             // 更新排序顺序
-            transform.SetSiblingIndex(placeholder != null ? placeholder.transform.GetSiblingIndex() : startSiblingIndex);
+            transform.SetSiblingIndex(startSiblingIndex);
             todoItem.sortOrder = transform.GetSiblingIndex();
             onCompleted?.Invoke(todoItem);
         }
@@ -141,6 +200,15 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         background.color = todoItem.isCompleted ? 
             new Color(0.8f, 0.8f, 0.8f) : 
             new Color(1f, 1f, 1f);
+        
+        // Reset delete area state
+        isOverDeleteArea = false;
+
+        // Hide delete area when dragging ends
+        if (TodoListUI.Instance != null)
+        {
+            TodoListUI.Instance.HideDeleteArea();
+        }
     }
 
     private Transform FindClosestContainer()

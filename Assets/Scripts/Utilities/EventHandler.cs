@@ -34,12 +34,13 @@ public static class EventHandler
 
 public static class ToolEventHandler
 {
-
+    // 番茄计时每个阶段开始学习时触发的事件
     public static event Action ToolFocusStartEvent;
     public static void CallToolFocusStartEvent()
     {
         ToolFocusStartEvent?.Invoke();
     }
+    // 番茄计时每个阶段开始休息时触发的事件
     public static event Action ToolBreakStartEvent;
     public static void CallToolBreakStartEvent()
     {

@@ -13,30 +13,6 @@ public class UIManager : MonoBehaviour
     // 已打开界面的缓存字典
     public Dictionary<string, BasePanel> panelDict;
 
-    private void OnEnable()
-    {
-        EventHandler.CharacterStateChangedEvent += OnCharacterStateChangedEvent;
-    }
-
-    private void OnDisable()
-    {
-        EventHandler.CharacterStateChangedEvent -= OnCharacterStateChangedEvent;
-    }
-
-    private void OnCharacterStateChangedEvent(CharacterState newState)
-    {
-        switch (newState)
-        {
-            case CharacterState.Idle:
-                break;
-            case CharacterState.Studying:
-                // Study Panel is now handled in the Studying scene
-                break;
-            case CharacterState.Resting:
-                // Resting state handled in Study scene
-                break;
-        }
-    }
 
     private void Awake()
     {

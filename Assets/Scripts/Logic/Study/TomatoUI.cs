@@ -15,10 +15,11 @@ public class TomatoUI : MonoBehaviour
     [Header("计时界面")]
     public GameObject timerPanel;
     public Slider progressBar;
-    public Text timeText;
-    public Text cycleText;
-    public Text phaseText;
-    public Button confirmButton;
+    public Text timeText;   // 倒计时
+    public Text cycleText;  // 处于哪个循环中
+    public Text phaseText;  // 处于什么阶段
+    public Button continueButton;
+    public Button stopButton;
     public Button cancelButton;
 
     private TomatoController timerController;
@@ -27,14 +28,14 @@ public class TomatoUI : MonoBehaviour
     {
         ToolEventHandler.ToolFocusStartEvent += () => UpdatePhaseDisplay("专注中");
         ToolEventHandler.ToolBreakStartEvent += () => UpdatePhaseDisplay("休息中");
-        ToolEventHandler.ToolCycleCompleteEvent += UpdateCycleDisplay;
+        ToolEventHandler.ToolCycleCompleteEvent += UpdateCycleTextDisplay;
         ToolEventHandler.ToolTimerCancelEvent += OnToolTimerCancelEvent;
     }
     private void OnDisable()
     {
         ToolEventHandler.ToolFocusStartEvent -= () => UpdatePhaseDisplay("专注中");
         ToolEventHandler.ToolBreakStartEvent -= () => UpdatePhaseDisplay("休息中");
-        ToolEventHandler.ToolCycleCompleteEvent -= UpdateCycleDisplay;
+        ToolEventHandler.ToolCycleCompleteEvent -= UpdateCycleTextDisplay;
         ToolEventHandler.ToolTimerCancelEvent -= OnToolTimerCancelEvent;
     }
 
@@ -46,38 +47,31 @@ public class TomatoUI : MonoBehaviour
             timerController = gameObject.AddComponent<TomatoController>();
         }
 
-        // 初始设置
+        // 配置界面按钮绑定事件
+        startButton.onClick.AddListener(OnStartButtonClicked);
+        returnButton.onClick.AddListener(OnReturnButtonClicked);
+        // 计时界面按钮绑定事件
+        continueButton.onClick.AddListener(OnContinueButtonClicked);
+        stopButton.onClick.AddListener(OnStopButtonClicked);
+        cancelButton.onClick.AddListener(OnCancelButtonClicked);
+
+        // 初始UI状态
         focusInput.text = "25";
         breakInput.text = "5";
         cyclesInput.text = "4";
-
-        // 绑定事件
-        startButton.onClick.AddListener(StartTimer);
-        returnButton.onClick.AddListener(EndTimer);
-        confirmButton.onClick.AddListener(ConfirmPhase);
-        cancelButton.onClick.AddListener(CancelTimer);
-
-        // 初始UI状态
         configPanel.SetActive(false);
         timerPanel.SetActive(false);
     }
 
     void Update()
     {
-        if (timerController.IsActive())
-        {
-            progressBar.value = timerController.GetProgress();
-            timeText.text = timerController.GetCurrentTimeFormatted();
-
-            // 自动检测时间结束
-            if (!timerController.IsActive())
-            {
-                confirmButton.gameObject.SetActive(true);
-            }
-        }
+        if (timerController.isActive == false) return;
+        
+        progressBar.value = timerController.GetProgressBarValue();
+        timeText.text = timerController.GetCountdownTime();
     }
 
-    private void StartTimer()
+    private void OnStartButtonClicked()
     {
         // 应用用户配置
         timerController.focusDuration = float.Parse(focusInput.text) * 60;
@@ -90,29 +84,32 @@ public class TomatoUI : MonoBehaviour
         // 切换UI
         configPanel.SetActive(false);
         timerPanel.SetActive(true);
-        confirmButton.gameObject.SetActive(false);
+        continueButton.gameObject.SetActive(false);
+        stopButton.gameObject.SetActive(true);
 
-        UpdateCycleDisplay();
+        UpdateCycleTextDisplay();
     }
 
-    private void EndTimer()
+    private void OnReturnButtonClicked()
     {
         configPanel.SetActive(false);
     }
 
-    private void ConfirmPhase()
+    private void OnContinueButtonClicked()
     {
-        timerController.ConfirmPhaseCompletion();
-        confirmButton.gameObject.SetActive(false);
-
-        // 如果计时器激活（进入新阶段），继续计时
-        if (timerController.IsActive())
-        {
-            timerController.StartTimer();
-        }
+        timerController.isActive = true;
+        continueButton.gameObject.SetActive(false);
+        stopButton.gameObject.SetActive(true);
     }
 
-    private void CancelTimer()
+    private void OnStopButtonClicked()
+    {
+        timerController.isActive = false;
+        continueButton.gameObject.SetActive(true);
+        stopButton.gameObject.SetActive(false);
+    }
+
+    private void OnCancelButtonClicked()
     {
         timerController.CancelTimer();
     }
@@ -128,7 +125,7 @@ public class TomatoUI : MonoBehaviour
         phaseText.text = phase;
     }
 
-    private void UpdateCycleDisplay()
+    private void UpdateCycleTextDisplay()
     {
         cycleText.text = $"{timerController.GetCompletedCycles()}/{timerController.targetCycles}";
     }
