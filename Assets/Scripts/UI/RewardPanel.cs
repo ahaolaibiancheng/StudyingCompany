@@ -25,7 +25,7 @@ public class RewardPanel : BasePanel
 
     protected override void Awake()
     {
-        packageTable = GameManager.Instance.GetPackageTable();
+        packageTable = PackageController.Instance.GetPackageTable();
     }
 
     private void Start()
@@ -41,7 +41,7 @@ public class RewardPanel : BasePanel
     private void OnStudyEndEvent()
     {
         int index = UnityEngine.Random.Range(0, packageTable.packageTableItems.Count - 1);
-        PackageTableItem item = GameManager.Instance.GetPackageItemById(index);
+        PackageTableItem item = PackageController.Instance.GetPackageItemById(index);
 
         Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(item.imagePath);
         LevelText.GetComponent<Text>().text = "Lv." + item.star.ToString();
@@ -62,7 +62,7 @@ public class RewardPanel : BasePanel
 
         // 存储
         string uid = PackageController.Instance.FindUidByTableId(item.id);
-        packageLocalItem = GameManager.Instance.GetPackageLocalItemByUId(uid);
+        packageLocalItem = PackageController.Instance.GetPackageLocalItemByUId(uid);
         if (packageLocalItem != null)
         {
             packageLocalItem.num++;

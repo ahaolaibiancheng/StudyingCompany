@@ -33,7 +33,7 @@ public class PackageDetail : MonoBehaviour
     {
         // 初始化：动态数据、静态数据、父物品逻辑
         this.packageLocalData = packageLocalData;
-        this.packageTableItem = GameManager.Instance.GetPackageItemById(packageLocalData.id);
+        this.packageTableItem = PackageController.Instance.GetPackageItemById(packageLocalData.id);
         this.uiParent = uiParent;
         // 等级
         // UILevelText.GetComponent<Text>().text = string.Format("Lv.{0}/40", this.packageLocalData.level.ToString());

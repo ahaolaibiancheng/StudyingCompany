@@ -88,7 +88,7 @@ public class PackagePanel : BasePanel
     private void RefreshDetail()
     {
         // 找到uid对应的动态数据
-        PackageLocalItem localItem = GameManager.Instance.GetPackageLocalItemByUId(chooseUID);
+        PackageLocalItem localItem = PackageController.Instance.GetPackageLocalItemByUId(chooseUID);
         // 刷新详情界面
         UIDetailPanel.GetComponent<PackageDetail>().Refresh(localItem, this);
     }
@@ -102,7 +102,7 @@ public class PackagePanel : BasePanel
             Destroy(scrollContent.GetChild(i).gameObject);
         }
 
-        foreach (PackageLocalItem localData in GameManager.Instance.GetSortPackageLocalData())
+        foreach (PackageLocalItem localData in PackageController.Instance.GetSortPackageLocalData())
         {
             Transform PackageUIItem = Instantiate(PackageUIItemPrefab.transform, scrollContent) as Transform;
             PackageCell packageCell = PackageUIItem.GetComponent<PackageCell>();
