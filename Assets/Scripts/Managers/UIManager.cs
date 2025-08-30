@@ -35,12 +35,13 @@ public class UIManager : MonoBehaviour
 
         pathDict = new Dictionary<string, string>()
         {
-            {UIConst.MenuPanel, "MenuPanel"},
-            {UIConst.TaskPanel, "TaskPanel"},
-            {UIConst.ReminderPanel, "ReminderPanel"},
-            {UIConst.PackagePanel, "PackagePanel"},
-            {UIConst.RewardPanel, "RewardPanel"},
-            // {UIConst.LotteryPanel, "LotteryPanel"},
+            {UIConst.MenuPanel, "Panel/MenuPanel"},
+            {UIConst.TaskPanel, "Panel/TaskPanel"},
+            {UIConst.ReminderPanel, "Panel/ReminderPanel"},
+            {UIConst.PackagePanel, "Panel/PackagePanel"},
+            {UIConst.RewardPanel, "Panel/RewardPanel"},
+            {UIConst.CharacterCanvas, "CharacterCanvas/CharacterCanvas"},
+            {UIConst.BaseInfoPanel, "BaseInfoPanel"},
         };
     }
 
@@ -97,7 +98,7 @@ public class UIManager : MonoBehaviour
         GameObject panelPrefab = null;
         if (!prefabDict.TryGetValue(name, out panelPrefab))
         {
-            string realPath = "Prefab/Panel/" + path;
+            string realPath = "Prefab/" + path;
 
             panelPrefab = Resources.Load<GameObject>(realPath) as GameObject;
             if (panelPrefab == null)
@@ -157,5 +158,6 @@ public class UIConst
     public const string ReminderPanel = "ReminderPanel";
     public const string PackagePanel = "PackagePanel";
     public const string RewardPanel = "RewardPanel";
-    // public const string LotteryPanel = "LotteryPanel";
+    public const string CharacterCanvas = "CharacterCanvas";
+    public const string BaseInfoPanel = "BaseInfoPanel";
 }
