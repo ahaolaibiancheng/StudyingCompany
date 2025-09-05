@@ -38,7 +38,7 @@ public class UIManager : MonoBehaviour
             {UIConst.MenuPanel, "Panel/MenuPanel"},
             {UIConst.TaskPanel, "Panel/TaskPanel"},
             {UIConst.ReminderPanel, "Panel/ReminderPanel"},
-            {UIConst.PackagePanel, "Panel/PackagePanel"},
+            {UIConst.PackagePanel, "CharacterCanvas/PackagePanel"},
             {UIConst.RewardPanel, "Panel/RewardPanel"},
             {UIConst.CharacterCanvas, "CharacterCanvas/CharacterCanvas"},
             {UIConst.BaseInfoPanel, "BaseInfoPanel"},

@@ -66,7 +66,7 @@ public class TodoItem
     {
         if (string.IsNullOrEmpty(completionTimeString) || string.IsNullOrEmpty(creationTimeString))
             return 0;
-        
+
         TimeSpan difference = completionTime - creationTime;
         return (int)Math.Ceiling(difference.TotalDays);
     }
@@ -87,13 +87,7 @@ public class TodoListController : MonoBehaviour
     public List<TodoItem> personalGrowthList = new List<TodoItem>();
     public List<TodoItem> financialManagementList = new List<TodoItem>();
 
-    // 类型分数
-    public int workStudyScore = 0;
-    public int personalHealthScore = 0;
-    public int familyLifeScore = 0;
-    public int socialRelationsScore = 0;
-    public int personalGrowthScore = 0;
-    public int financialManagementScore = 0;
+    public ScoreManager scoreManager;
 
     private string savePath;
 
@@ -119,7 +113,7 @@ public class TodoListController : MonoBehaviour
             importantNotUrgent.Add(item);
         else
             notImportantNotUrgent.Add(item);
-        
+
         SaveTodoList();
     }
 
@@ -183,12 +177,7 @@ public class TodoListController : MonoBehaviour
             socialRelationsList = this.socialRelationsList,
             personalGrowthList = this.personalGrowthList,
             financialManagementList = this.financialManagementList,
-            workStudyScore = this.workStudyScore,
-            personalHealthScore = this.personalHealthScore,
-            familyLifeScore = this.familyLifeScore,
-            socialRelationsScore = this.socialRelationsScore,
-            personalGrowthScore = this.personalGrowthScore,
-            financialManagementScore = this.financialManagementScore
+
         };
 
         string json = JsonUtility.ToJson(data, true);
@@ -206,7 +195,7 @@ public class TodoListController : MonoBehaviour
             notImportantUrgent = data.notImportantUrgent ?? new List<TodoItem>();
             importantNotUrgent = data.importantNotUrgent ?? new List<TodoItem>();
             notImportantNotUrgent = data.notImportantNotUrgent ?? new List<TodoItem>();
-            
+
             // 加载类型特定的列表
             workStudyList = data.workStudyList ?? new List<TodoItem>();
             personalHealthList = data.personalHealthList ?? new List<TodoItem>();
@@ -214,66 +203,58 @@ public class TodoListController : MonoBehaviour
             socialRelationsList = data.socialRelationsList ?? new List<TodoItem>();
             personalGrowthList = data.personalGrowthList ?? new List<TodoItem>();
             financialManagementList = data.financialManagementList ?? new List<TodoItem>();
-            
-            // 加载类型分数
-            workStudyScore = data.workStudyScore;
-            personalHealthScore = data.personalHealthScore;
-            familyLifeScore = data.familyLifeScore;
-            socialRelationsScore = data.socialRelationsScore;
-            personalGrowthScore = data.personalGrowthScore;
-            financialManagementScore = data.financialManagementScore;
+
         }
 
-        // 重新计算所有类型分数
-        RecalculateTypeScores();
     }
 
     // 遍历所有类型列表成员，重新计算分数
     private void RecalculateTypeScores()
     {
         // 重置所有分数
-        workStudyScore = 0;
-        personalHealthScore = 0;
-        familyLifeScore = 0;
-        socialRelationsScore = 0;
-        personalGrowthScore = 0;
-        financialManagementScore = 0;
+        scoreManager.workStudyScore = 0;
+        scoreManager.personalHealthScore = 0;
+        scoreManager.familyLifeScore = 0;
+        scoreManager.socialRelationsScore = 0;
+        scoreManager.personalGrowthScore = 0;
+        scoreManager.financialManagementScore = 0;
 
         // 遍历工作/学业列表
         foreach (var item in workStudyList)
         {
-            workStudyScore += item.GetScore();
+            scoreManager.workStudyScore += item.GetScore();
         }
 
         // 遍历个人健康列表
         foreach (var item in personalHealthList)
         {
-            personalHealthScore += item.GetScore();
+            scoreManager.personalHealthScore += item.GetScore();
         }
 
         // 遍历家庭生活列表
         foreach (var item in familyLifeList)
         {
-            familyLifeScore += item.GetScore();
+            scoreManager.familyLifeScore += item.GetScore();
         }
 
         // 遍历社交人际列表
         foreach (var item in socialRelationsList)
         {
-            socialRelationsScore += item.GetScore();
+            scoreManager.socialRelationsScore += item.GetScore();
         }
 
         // 遍历个人成长/兴趣列表
         foreach (var item in personalGrowthList)
         {
-            personalGrowthScore += item.GetScore();
+            scoreManager.personalGrowthScore += item.GetScore();
         }
 
         // 遍历财务管理列表
         foreach (var item in financialManagementList)
         {
-            financialManagementScore += item.GetScore();
+            scoreManager.financialManagementScore += item.GetScore();
         }
+        scoreManager.SaveScore();
     }
 
     // 公开方法用于重新计算类型分数（供UI调用）
@@ -290,7 +271,7 @@ public class TodoListController : MonoBehaviour
         public List<TodoItem> notImportantUrgent;
         public List<TodoItem> importantNotUrgent;
         public List<TodoItem> notImportantNotUrgent;
-        
+
         // 类型特定的列表
         public List<TodoItem> workStudyList;
         public List<TodoItem> personalHealthList;
@@ -298,13 +279,5 @@ public class TodoListController : MonoBehaviour
         public List<TodoItem> socialRelationsList;
         public List<TodoItem> personalGrowthList;
         public List<TodoItem> financialManagementList;
-        
-        // 类型分数
-        public int workStudyScore;
-        public int personalHealthScore;
-        public int familyLifeScore;
-        public int socialRelationsScore;
-        public int personalGrowthScore;
-        public int financialManagementScore;
     }
 }

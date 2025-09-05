@@ -61,6 +61,7 @@ public class TodoListUI : MonoBehaviour
     public Text deleteAreaText;
 
     private TodoListController todoController;
+    private ScoreManager scoreManager;
 
     // 当前显示的状态
     private string currentCategoryName;
@@ -78,6 +79,9 @@ public class TodoListUI : MonoBehaviour
         todoController = GetComponent<TodoListController>();
         if (todoController == null)
             todoController = gameObject.AddComponent<TodoListController>();
+        scoreManager = GetComponent<ScoreManager>();
+        if (scoreManager == null)
+            scoreManager = gameObject.AddComponent<ScoreManager>();
         
         submitButton.onClick.AddListener(AddNewTask);
         cancelButton.onClick.AddListener(CancelNewTask);
@@ -93,12 +97,12 @@ public class TodoListUI : MonoBehaviour
         notImportantNotUrgentButton.onClick.AddListener(() => ShowList("不重要且不紧急", todoController.notImportantNotUrgent, false));
         
         // 绑定类型分类按钮事件
-        if (workStudyButton != null) workStudyButton.onClick.AddListener(() => ShowList("工作/学业", todoController.workStudyList, true, todoController.workStudyScore));
-        if (personalHealthButton != null) personalHealthButton.onClick.AddListener(() => ShowList("个人健康", todoController.personalHealthList, true, todoController.personalHealthScore));
-        if (familyLifeButton != null) familyLifeButton.onClick.AddListener(() => ShowList("家庭生活", todoController.familyLifeList, true, todoController.familyLifeScore));
-        if (socialRelationsButton != null) socialRelationsButton.onClick.AddListener(() => ShowList("社交人际", todoController.socialRelationsList, true, todoController.socialRelationsScore));
-        if (personalGrowthButton != null) personalGrowthButton.onClick.AddListener(() => ShowList("个人成长/兴趣", todoController.personalGrowthList, true, todoController.personalGrowthScore));
-        if (financialManagementButton != null) financialManagementButton.onClick.AddListener(() => ShowList("财务管理", todoController.financialManagementList, true, todoController.financialManagementScore));
+        if (workStudyButton != null) workStudyButton.onClick.AddListener(() => ShowList("工作/学业", todoController.workStudyList, true, scoreManager.workStudyScore));
+        if (personalHealthButton != null) personalHealthButton.onClick.AddListener(() => ShowList("个人健康", todoController.personalHealthList, true, scoreManager.personalHealthScore));
+        if (familyLifeButton != null) familyLifeButton.onClick.AddListener(() => ShowList("家庭生活", todoController.familyLifeList, true, scoreManager.familyLifeScore));
+        if (socialRelationsButton != null) socialRelationsButton.onClick.AddListener(() => ShowList("社交人际", todoController.socialRelationsList, true, scoreManager.socialRelationsScore));
+        if (personalGrowthButton != null) personalGrowthButton.onClick.AddListener(() => ShowList("个人成长/兴趣", todoController.personalGrowthList, true, scoreManager.personalGrowthScore));
+        if (financialManagementButton != null) financialManagementButton.onClick.AddListener(() => ShowList("财务管理", todoController.financialManagementList, true, scoreManager.financialManagementScore));
         
         // 默认显示重要且紧急分类
         ShowList("重要且紧急", todoController.importantUrgent, false);
@@ -152,7 +156,7 @@ public class TodoListUI : MonoBehaviour
         historyButton.gameObject.SetActive(false);
         addUpPanel.SetActive(false);
         hisUpPanel.SetActive(true);
-        ShowList("工作/学业", todoController.workStudyList, true, todoController.workStudyScore);
+        ShowList("工作/学业", todoController.workStudyList, true, scoreManager.workStudyScore);
     }
 
     public void ShowAddTaskPanel()
@@ -330,17 +334,17 @@ public class TodoListUI : MonoBehaviour
         switch (categoryName)
         {
             case "工作/学业":
-                return todoController.workStudyScore;
+                return scoreManager.workStudyScore;
             case "个人健康":
-                return todoController.personalHealthScore;
+                return scoreManager.personalHealthScore;
             case "家庭生活":
-                return todoController.familyLifeScore;
+                return scoreManager.familyLifeScore;
             case "社交人际":
-                return todoController.socialRelationsScore;
+                return scoreManager.socialRelationsScore;
             case "个人成长/兴趣":
-                return todoController.personalGrowthScore;
+                return scoreManager.personalGrowthScore;
             case "财务管理":
-                return todoController.financialManagementScore;
+                return scoreManager.financialManagementScore;
             default:
                 return 0;
         }

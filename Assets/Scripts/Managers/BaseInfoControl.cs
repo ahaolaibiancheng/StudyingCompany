@@ -31,13 +31,13 @@ public class BaseInfoControl : MonoBehaviour
         {"化神期", (2000, int.MaxValue)}
     };
 
-    private TodoListController todoListController;
+    private ScoreManager scoreManager;
 
     void Awake()
     {
         // 获取TodoListController引用
-        todoListController = FindObjectOfType<TodoListController>();
-        if (todoListController == null)
+        scoreManager = FindObjectOfType<ScoreManager>();
+        if (scoreManager == null)
         {
             Debug.LogError("TodoListController not found in scene!");
         }
@@ -49,15 +49,15 @@ public class BaseInfoControl : MonoBehaviour
     // 计算总分（从TodoListController获取各类型分数并求和）
     public void CalculateTotalScore()
     {
-        if (todoListController == null) return;
+        if (scoreManager == null) return;
 
         totalScore = baseScore + 
-                   todoListController.workStudyScore +
-                   todoListController.personalHealthScore +
-                   todoListController.familyLifeScore +
-                   todoListController.socialRelationsScore +
-                   todoListController.personalGrowthScore +
-                   todoListController.financialManagementScore;
+                   scoreManager.workStudyScore +
+                   scoreManager.personalHealthScore +
+                   scoreManager.familyLifeScore +
+                   scoreManager.socialRelationsScore +
+                   scoreManager.personalGrowthScore +
+                   scoreManager.financialManagementScore;
     }
 
     // 获取当前境界等级
@@ -188,7 +188,7 @@ public class BaseInfoControl : MonoBehaviour
     // 获取各类型分数详情
     public Dictionary<string, int> GetScoreDetails()
     {
-        if (todoListController == null)
+        if (scoreManager == null)
         {
             return new Dictionary<string, int>
             {
@@ -201,14 +201,15 @@ public class BaseInfoControl : MonoBehaviour
             };
         }
 
+        scoreManager.LoadScore();
         return new Dictionary<string, int>
         {
-            {"工作/学业", todoListController.workStudyScore},
-            {"个人健康", todoListController.personalHealthScore},
-            {"家庭生活", todoListController.familyLifeScore},
-            {"社交人际", todoListController.socialRelationsScore},
-            {"个人成长/兴趣", todoListController.personalGrowthScore},
-            {"财务管理", todoListController.financialManagementScore}
+            {"工作/学业", scoreManager.workStudyScore},
+            {"个人健康", scoreManager.personalHealthScore},
+            {"家庭生活", scoreManager.familyLifeScore},
+            {"社交人际", scoreManager.socialRelationsScore},
+            {"个人成长/兴趣", scoreManager.personalGrowthScore},
+            {"财务管理", scoreManager.financialManagementScore}
         };
     }
 

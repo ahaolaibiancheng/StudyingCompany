@@ -2,10 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(menuName = "PackageSystem/PackageTable", fileName = "PackageTable")]
-public class PackageTable : ScriptableObject
+[CreateAssetMenu(menuName = "DataTables/PackageTable", fileName = "PackageTable")]
+public class PackageTable : ScriptableObject, IDataTable<PackageTableItem>
 {
     public List<PackageTableItem> packageTableItems = new List<PackageTableItem>();
+    
+    public void AddItem(PackageTableItem item)
+    {
+        packageTableItems.Add(item);
+    }
 }
 
 [System.Serializable]
