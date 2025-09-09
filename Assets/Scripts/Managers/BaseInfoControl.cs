@@ -51,6 +51,7 @@ public class BaseInfoControl : MonoBehaviour
     {
         if (scoreManager == null) return;
 
+        scoreManager.LoadScore();
         totalScore = baseScore + 
                    scoreManager.workStudyScore +
                    scoreManager.personalHealthScore +

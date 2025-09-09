@@ -58,3 +58,13 @@ public static class ToolEventHandler
     }
 
 }
+
+public static class DecorateEventHandler
+{
+    public static event Action<string> DecorateChooseUIDChanged;
+    public static void CallDecorateChooseUIDChanged(string uid)
+    {
+        DecorateChooseUIDChanged?.Invoke(uid);
+    }
+
+}

@@ -8,33 +8,21 @@ public class CharacterCanvas : BasePanel
 {
     public Button baseButton;
     public Button mouthButton;
-    public Button closeButton;
+    public Button eysButton;
+    public Button cheeksButton;
     public Transform UIScrollView;
     public GameObject DecorateUIItemPrefab;
     public GameObject baseInfoPanel;
     public GameObject decoratePanel;
 
-    private string _chooseUid;
-    public string chooseUID
-    {
-        get
-        {
-            return _chooseUid;
-        }
-        set
-        {
-            _chooseUid = value;
-            // TODO: 刷新人物图示
-        }
-    }
-
     void Start()
     {
         baseButton.onClick.AddListener(OnBaseBtnClicked);
         mouthButton.onClick.AddListener(OnMouthBtnClicked);
-        closeButton.onClick.AddListener(OnCloseBtnClicked);
-    }
+        eysButton.onClick.AddListener(OnEyeBtnClicked);
+        cheeksButton.onClick.AddListener(OnCheeksBtnClicked);
 
+    }
     private void OnBaseBtnClicked()
     {
         baseInfoPanel.SetActive(true);
@@ -47,12 +35,22 @@ public class CharacterCanvas : BasePanel
         decoratePanel.SetActive(true);
         // 刷新物品
         RefreshScroll(DecorateType.Mouth);
-        // 打开界面
     }
 
-    private void OnCloseBtnClicked()
+    private void OnCheeksBtnClicked()
     {
-        UIManager.Instance.ClosePanel(UIConst.CharacterCanvas);
+        baseInfoPanel.SetActive(false);
+        decoratePanel.SetActive(true);
+        // 刷新物品
+        RefreshScroll(DecorateType.Cheeks);
+    }
+
+    private void OnEyeBtnClicked()
+    {
+        baseInfoPanel.SetActive(false);
+        decoratePanel.SetActive(true);
+        // 刷新物品
+        RefreshScroll(DecorateType.Eyes);
     }
 
     private void RefreshScroll(DecorateType type)
@@ -69,7 +67,7 @@ public class CharacterCanvas : BasePanel
         {
             Transform DecorateUIItem = Instantiate(DecorateUIItemPrefab.transform, scrollContent) as Transform;
             DecorateCell decorateCell = DecorateUIItem.GetComponent<DecorateCell>();
-            decorateCell.Refresh(localData, this, type);
+            decorateCell.Refresh(localData, type);
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,7 +21,6 @@ public class DecorateCell : MonoBehaviour , IPointerClickHandler, IPointerEnterH
 
     private DecorateLocalItem decorateLocalData;
     private DecorateTableItem decorateTableItem;
-    private CharacterCanvas uiParent;
 
     private void Awake()
     {
@@ -43,12 +43,11 @@ public class DecorateCell : MonoBehaviour , IPointerClickHandler, IPointerEnterH
         // // UISelectAni.gameObject.SetActive(false);
     }
 
-    public void Refresh(DecorateLocalItem decorateLocalData, CharacterCanvas uiParent, DecorateType type)
+    public void Refresh(DecorateLocalItem decorateLocalData, DecorateType type)
     {
         // 数据初始化
         this.decorateLocalData = decorateLocalData;
         this.decorateTableItem = DecorateController.Instance.GetDecorateItemById(type, decorateLocalData.id);
-        this.uiParent = uiParent;
         // 等级信息
         UILevel.GetComponent<Text>().text = "Lv." + this.decorateLocalData.star.ToString();
         // 是否是新获得？
@@ -88,30 +87,20 @@ public class DecorateCell : MonoBehaviour , IPointerClickHandler, IPointerEnterH
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        // print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + this.uiParent.curMode.ToString());
-        Debug.Log("OnPointerClick: " + eventData.ToString());
-        // if (this.uiParent.curMode == DecorateMode.delete)
-        // {
-        //     this.uiParent.AddChooseDeleteUid(this.decorateLocalData.uid);
-        // }
-        if (this.uiParent.chooseUID == this.decorateLocalData.uid)
-            return;
-        // 根据点击设置最新的uid -> 进而刷新详情界面
-        this.uiParent.chooseUID = this.decorateLocalData.uid;
-        // UISelectAni.gameObject.SetActive(true);
-        // UISelectAni.GetComponent<Animator>().SetTrigger("In");
+        // Debug.Log("OnPointerClick: " + eventData.ToString());
+        DecorateEventHandler.CallDecorateChooseUIDChanged(this.decorateLocalData.uid);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("OnPointerEnter: " + eventData.ToString());
+        // Debug.Log("OnPointerEnter: " + eventData.ToString());
         // UIMouseOverAni.gameObject.SetActive(true);
         // UIMouseOverAni.GetComponent<Animator>().SetTrigger("In");
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log("OnPointerExit: " + eventData.ToString());
+        // Debug.Log("OknPointerExit: " + eventData.ToString());
         // UIMouseOverAni.GetComponent<Animator>().SetTrigger("Out");
     }
 

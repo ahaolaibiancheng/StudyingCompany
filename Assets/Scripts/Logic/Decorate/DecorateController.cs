@@ -47,11 +47,8 @@ public class DecorateController : MonoBehaviour
             default:
                 break;
         }
-        if (decorateTable == null)
-        {
-            decorateTable = Resources.Load<DecorateTable>(path);
-        }
-        return decorateTable;
+        // TODO:每次都重新加载，性能问题
+        return Resources.Load<DecorateTable>(path);
     }
 
     public DecorateLocalData GetDecorateLocalData()
