@@ -10,30 +10,30 @@ public class CursorManager : MonoBehaviour
     {
         get
         {
-            // 基本检查
-            if (Camera.main == null) return Vector3.zero;
+            // // 基本检查
+            // if (Camera.main == null) return Vector3.zero;
             
-            Vector3 mousePos = Input.mousePosition;
+            // Vector3 mousePos = Input.mousePosition;
             
-            // 简单的有效性检查
-            if (mousePos.x <= 0 && mousePos.y <= 0) return Vector3.zero;
-            if (float.IsNaN(mousePos.x) || float.IsInfinity(mousePos.x)) return Vector3.zero;
-            if (float.IsNaN(mousePos.y) || float.IsInfinity(mousePos.y)) return Vector3.zero;
+            // // 简单的有效性检查
+            // if (mousePos.x <= 0 && mousePos.y <= 0) return Vector3.zero;
+            // if (float.IsNaN(mousePos.x) || float.IsInfinity(mousePos.x)) return Vector3.zero;
+            // if (float.IsNaN(mousePos.y) || float.IsInfinity(mousePos.y)) return Vector3.zero;
 
-            try
-            {
-                Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
-                // 检查转换后的世界坐标是否有效
-                if (float.IsNaN(worldPos.x) || float.IsNaN(worldPos.y) || float.IsInfinity(worldPos.x) || float.IsInfinity(worldPos.y))
-                {
-                    return Vector3.zero;
-                }
-                return worldPos;
-            }
-            catch
-            {
+            // try
+            // {
+            //     Vector3 worldPos = Camera.main.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, 0));
+            //     // 检查转换后的世界坐标是否有效
+            //     if (float.IsNaN(worldPos.x) || float.IsNaN(worldPos.y) || float.IsInfinity(worldPos.x) || float.IsInfinity(worldPos.y))
+            //     {
+            //         return Vector3.zero;
+            //     }
+            //     return worldPos;
+            // }
+            // catch
+            // {
                 return Vector3.zero;
-            }
+            // }
         }
     }
     private bool canClick;

@@ -24,4 +24,13 @@ public class GameManager : MonoBehaviour
     {
         // Debug.Log("Screen.width/height: " + Screen.width + "/" + Screen.height);
     }
+
+    // In your existing GameManager.cs or similar
+    public void ChangeWeather(RainIntensity intensity)
+    {
+        WeatherManager.Instance.SetRainIntensity(intensity);
+        
+        // Optional: Notify other systems about weather change
+        // EventHandler.Instance.TriggerWeatherChanged(intensity);
+    }
 }

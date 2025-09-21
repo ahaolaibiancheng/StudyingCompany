@@ -52,13 +52,13 @@ public class BaseInfoControl : MonoBehaviour
         if (scoreManager == null) return;
 
         scoreManager.LoadScore();
-        totalScore = baseScore + 
-                   scoreManager.workStudyScore +
-                   scoreManager.personalHealthScore +
-                   scoreManager.familyLifeScore +
-                   scoreManager.socialRelationsScore +
-                   scoreManager.personalGrowthScore +
-                   scoreManager.financialManagementScore;
+        totalScore = baseScore +
+                   scoreManager.scoreData.workStudyScore +
+                   scoreManager.scoreData.personalHealthScore +
+                   scoreManager.scoreData.familyLifeScore +
+                   scoreManager.scoreData.socialRelationsScore +
+                   scoreManager.scoreData.personalGrowthScore +
+                   scoreManager.scoreData.financialManagementScore;
     }
 
     // 获取当前境界等级
@@ -101,7 +101,7 @@ public class BaseInfoControl : MonoBehaviour
             {
                 int nextLayerScore = baseScore + currentLayer * scorePerLayer;
                 int currentLayerScore = baseScore + (currentLayer - 1) * scorePerLayer;
-                return $"当前: {currentLayerScore}-{nextLayerScore-1}分\n下一层: {nextLayerScore}分";
+                return $"当前: {currentLayerScore}-{nextLayerScore - 1}分\n下一层: {nextLayerScore}分";
             }
             else
             {
@@ -205,12 +205,12 @@ public class BaseInfoControl : MonoBehaviour
         scoreManager.LoadScore();
         return new Dictionary<string, int>
         {
-            {"工作/学业", scoreManager.workStudyScore},
-            {"个人健康", scoreManager.personalHealthScore},
-            {"家庭生活", scoreManager.familyLifeScore},
-            {"社交人际", scoreManager.socialRelationsScore},
-            {"个人成长/兴趣", scoreManager.personalGrowthScore},
-            {"财务管理", scoreManager.financialManagementScore}
+            {"工作/学业", scoreManager.scoreData.workStudyScore},
+            {"个人健康", scoreManager.scoreData.personalHealthScore},
+            {"家庭生活", scoreManager.scoreData.familyLifeScore},
+            {"社交人际", scoreManager.scoreData.socialRelationsScore},
+            {"个人成长/兴趣", scoreManager.scoreData.personalGrowthScore},
+            {"财务管理", scoreManager.scoreData.financialManagementScore}
         };
     }
 
