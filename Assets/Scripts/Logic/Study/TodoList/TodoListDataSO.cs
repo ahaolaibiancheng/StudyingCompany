@@ -71,6 +71,42 @@ public class TodoListDataSO : ScriptableObject
                 break;
         }
     }
+
+    public void CompleteDailyItem(TodoItem item)
+    {
+        TodoItem dailyItem = FindItemByGuid(item.guid);
+        if (dailyItem != null)
+        {
+            dailyItem.rewardTotal += item.rewardDaily;
+            dailyItem.completedTimes++;
+        }
+    }
+
+    private TodoItem FindItemByGuid(string guid)
+    {
+        if (importantUrgent.Exists(item => item.guid == guid))
+        {
+            return importantUrgent.Find(item => item.guid == guid);
+        }
+        else if (notImportantUrgent.Exists(item => item.guid == guid))
+        {
+            return notImportantUrgent.Find(item => item.guid == guid);
+        }
+        else if (importantNotUrgent.Exists(item => item.guid == guid))
+        {
+            return importantNotUrgent.Find(item => item.guid == guid);
+        }
+        else if (notImportantNotUrgent.Exists(item => item.guid == guid))
+        {
+            return notImportantNotUrgent.Find(item => item.guid == guid);
+        }
+        else
+        {
+            Debug.LogError("TodoItem not found");
+            return null;
+        }
+
+    }
 }
 
 [System.Serializable]

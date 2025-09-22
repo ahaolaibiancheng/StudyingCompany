@@ -5,13 +5,15 @@ using System.IO;
 using System;
 using Unity.VisualScripting;
 
-public class TodoListController : MonoBehaviour
+public class TodoListController : Singleton<TodoListController>
 {
     public TodoListDataSO todoListDataSO;
+    public DetailPanelUI detailPanel;
     private ScoreManager scoreManager;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         scoreManager = ScoreManager.Instance;
     }
 
@@ -50,6 +52,14 @@ public class TodoListController : MonoBehaviour
         todoListDataSO.CompleteTodoItem(item);
         // 计算所有类型分数
         RecalculateTypeScores();
+
+        SaveTodoList();
+    }
+
+    public void CompleteDailyItem(TodoItem item)
+    {
+        // 更新该任务的总奖励
+        todoListDataSO.CompleteDailyItem(item);
 
         SaveTodoList();
     }

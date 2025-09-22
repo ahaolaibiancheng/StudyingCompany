@@ -12,4 +12,14 @@ public static class TodoListEventHandler
     {
         TodoItemCompleted?.Invoke(todoItem);
     }
+
+    /// <summary>
+    /// 触发日常任务完成事件
+    /// </summary>
+    /// <param name="todoItem"></param>
+    public static event Action<TodoItem> DailyItemCompleted;
+    public static void CallDailyItemCompleted(TodoItem todoItem)
+    {
+        DailyItemCompleted?.Invoke(todoItem);
+    }
 }

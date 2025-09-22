@@ -22,3 +22,8 @@ public enum PetItemsType
 {
     Food, Dress
 }
+
+public enum BaseItemType
+{
+    Daily, Normal, History
+}

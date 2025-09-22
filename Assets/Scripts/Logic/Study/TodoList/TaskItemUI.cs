@@ -21,7 +21,7 @@ public class TaskItemUI : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private int startSiblingIndex;
     private GameObject placeholder;
     // private bool isDragging = false;
-    private bool isOverDeleteArea = false;
+    // private bool isOverDeleteArea = false;
     private RectTransform deleteAreaRect;
 
     public void Initialize(TodoItem item, Action<TodoItem> completedCallback, Action<TodoItem, Transform> movedCallback, Action<TodoItem> deleteCallback = null, RectTransform deleteArea = null)

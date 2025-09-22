@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 using System;
 
-public class ShowItemUI : BaseItem
+public class DailyItemUI : BaseItem
 {
     // Drag and drop variables
     private RectTransform parentRect;
@@ -16,7 +16,8 @@ public class ShowItemUI : BaseItem
 
     private void OnToggleChanged(bool isCompleted)
     {
-        baseItem.isCompleted = isCompleted;
-        TodoListEventHandler.CallTodoItemCompleted(baseItem);
+        // isCompleted必为true
+        TodoListEventHandler.CallDailyItemCompleted(baseItem);
+        Destroy(gameObject);
     }
 }

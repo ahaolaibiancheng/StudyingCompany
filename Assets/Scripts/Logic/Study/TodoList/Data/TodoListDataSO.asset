@@ -12,11 +12,71 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: afd0effbc018aa241b98e43329c201c6, type: 3}
   m_Name: TodoListDataSO
   m_EditorClassIdentifier: 
-  importantUrgent: []
+  importantUrgent:
+  - guid: 770b9508-0fd5-4623-8332-2d09640026b9
+    keywords: aaaaa
+    isImportant: 1
+    isUrgent: 1
+    isCompleted: 0
+    type: "\u5DE5\u4F5C/\u5B66\u4E1A"
+    rewardDaily: 1
+    rewardTotal: 1
+    completedTimes: 1
+    period: 01010101010101
+    description: aaaaa
+    sortOrder: 0
+    creationTimeString: 2025-09-22 11:48:37
+    deadlineTimeString: 2025-01-01 00:00:00
+    completionTimeString: 9999-12-31 23:59:59
   notImportantUrgent: []
   importantNotUrgent: []
   notImportantNotUrgent: []
-  workStudyList: []
+  workStudyList:
+  - guid: cb42d27c-527f-4b68-8915-399ef1ebce89
+    keywords: 2222
+    isImportant: 1
+    isUrgent: 1
+    isCompleted: 1
+    type: "\u5DE5\u4F5C/\u5B66\u4E1A"
+    rewardDaily: 1
+    rewardTotal: 0
+    completedTimes: 0
+    period: 01000000010101
+    description: 333333
+    sortOrder: 0
+    creationTimeString: 
+    deadlineTimeString: 
+    completionTimeString: 2025-09-21 23:01:06
+  - guid: 86297aa3-e9ab-4e40-999b-75fda9f86f13
+    keywords: 111
+    isImportant: 1
+    isUrgent: 1
+    isCompleted: 1
+    type: "\u5DE5\u4F5C/\u5B66\u4E1A"
+    rewardDaily: 1
+    rewardTotal: 0
+    completedTimes: 0
+    period: 01010101010101
+    description: 22222
+    sortOrder: 1
+    creationTimeString: 
+    deadlineTimeString: 
+    completionTimeString: 
+  - guid: 98b6e599-448e-4a55-a580-38714151f903
+    keywords: 2222
+    isImportant: 1
+    isUrgent: 1
+    isCompleted: 1
+    type: "\u5DE5\u4F5C/\u5B66\u4E1A"
+    rewardDaily: 1
+    rewardTotal: 0
+    completedTimes: 0
+    period: 01000000010101
+    description: 333333
+    sortOrder: 2
+    creationTimeString: 
+    deadlineTimeString: 
+    completionTimeString: 2025-09-21 23:30:32
   personalHealthList: []
   familyLifeList: []
   socialRelationsList: []

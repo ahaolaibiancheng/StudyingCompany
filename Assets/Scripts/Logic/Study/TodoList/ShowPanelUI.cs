@@ -27,7 +27,7 @@ public class ShowPanelUI : MonoBehaviour
     public UnityEngine.UI.Button historyButton;
 
     [Header("Show Item Prefab")]
-    public GameObject todoListShowItemPrefab;
+    public GameObject todoListItemPrefab;
     [Header("Panel UI")]
     public GameObject homeTypePanel;
     public GameObject hisTypePanel;
@@ -133,9 +133,9 @@ public class ShowPanelUI : MonoBehaviour
     {
         parent = tasksContainer;
 
-        GameObject taskItem = Instantiate(todoListShowItemPrefab, parent);
-        ShowItemUI itemUI = taskItem.GetComponent<ShowItemUI>();
-        itemUI.Initialize(item, OnTaskMoved, OnTaskDeleted, null);
+        GameObject taskItem = Instantiate(todoListItemPrefab, parent);
+        BaseItem itemUI = taskItem.GetComponent<ShowItemUI>();
+        itemUI.Initialize(item);
     }
 
     private void OnTaskCompleted(TodoItem item)
