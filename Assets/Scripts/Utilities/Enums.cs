@@ -23,7 +23,7 @@ public enum PetItemsType
     Food, Dress
 }
 
-public enum BaseItemType
+public enum TodoBaseItemType
 {
     Daily, Normal, History
 }

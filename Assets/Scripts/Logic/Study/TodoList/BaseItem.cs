@@ -5,10 +5,10 @@ using UnityEngine.EventSystems;
 using TMPro;
 using System;
 
-public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
-    [SerializeField] protected TodoItem baseItem;
-    [SerializeField] protected BaseItemType type;
+    [SerializeField] protected TodoItem todoBaseItem;
+    [SerializeField] protected TodoBaseItemType type;
     public Toggle completionToggle;
     public TextMeshProUGUI contentText;
     public TextMeshProUGUI deadlineTime;
@@ -25,7 +25,7 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private int originalSiblingIndex;
     private Vector2 dragOffset;
     private bool isDragging = false;
-    private BaseItem targetSwapItem = null;
+    private TodoBaseItem targetSwapItem = null;
 
     // 交换动画控制
     private bool isSwapping = false;
@@ -42,12 +42,12 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void Initialize(TodoItem item)
     {
-        baseItem = item;
-        completionToggle.isOn = (type == BaseItemType.History) ? true : false;
-        completionToggle.interactable = (type == BaseItemType.History) ? false : true;
+        todoBaseItem = item;
+        completionToggle.isOn = (type == TodoBaseItemType.History) ? true : false;
+        completionToggle.interactable = (type == TodoBaseItemType.History) ? false : true;
         contentText.text = item.keywords;
-        deadlineTime.text = ((type == BaseItemType.History) ? item.completionTime : item.deadlineTime).ToString("yyyy/MM/dd");
-        deadlineTime.gameObject.SetActive(type != BaseItemType.Daily);
+        deadlineTime.text = ((type == TodoBaseItemType.History) ? item.completionTime : item.deadlineTime).ToString("yyyy/MM/dd");
+        deadlineTime.gameObject.SetActive(type != TodoBaseItemType.Daily);
         totalreward.text = item.rewardTotal.ToString();
 
         transform.SetSiblingIndex(item.sortOrder);
@@ -60,7 +60,7 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        TodoListController.Instance.detailPanel.SetupDetail(baseItem);
+        TodoListController.Instance.detailPanel.SetupDetail(todoBaseItem);
         TodoListController.Instance.detailPanel.gameObject.SetActive(true);
     }
 
@@ -194,7 +194,7 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         if (originalParent == null) return;
 
-        BaseItem newTargetSwapItem = null;
+        TodoBaseItem newTargetSwapItem = null;
         Vector2 mousePosition = eventData.position;
 
         // 遍历同一容器中的所有项目
@@ -203,7 +203,7 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             Transform child = originalParent.GetChild(i);
             if (child == transform) continue; // 跳过自己
 
-            BaseItem otherItem = child.GetComponent<BaseItem>();
+            TodoBaseItem otherItem = child.GetComponent<TodoBaseItem>();
             if (otherItem != null)
             {
                 RectTransform otherRect = otherItem.GetComponent<RectTransform>();
@@ -254,7 +254,7 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     /// </summary>
     /// <param name="targetItem"></param>
     /// <returns></returns>
-    // private IEnumerator SmoothSwapWithItem(BaseItem targetItem)
+    // private IEnumerator SmoothSwapWithItem(TodoBaseItem targetItem)
     // {
     //     isSwapping = true;
 
@@ -310,9 +310,9 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private void UpdateSortOrder()
     {
         // 更新当前项的排序顺序
-        if (baseItem != null)
+        if (todoBaseItem != null)
         {
-            baseItem.sortOrder = transform.GetSiblingIndex();
+            todoBaseItem.sortOrder = transform.GetSiblingIndex();
         }
 
         // 更新同容器中所有项的排序顺序
@@ -320,10 +320,10 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         {
             for (int i = 0; i < originalParent.childCount; i++)
             {
-                BaseItem item = originalParent.GetChild(i).GetComponent<BaseItem>();
-                if (item != null && item.baseItem != null)
+                TodoBaseItem item = originalParent.GetChild(i).GetComponent<TodoBaseItem>();
+                if (item != null && item.todoBaseItem != null)
                 {
-                    item.baseItem.sortOrder = i;
+                    item.todoBaseItem.sortOrder = i;
                 }
             }
         }
@@ -337,7 +337,7 @@ public class BaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         transform.SetSiblingIndex(originalSiblingIndex);
     }
 
-    private IEnumerator SmoothSwapWithItem(BaseItem targetItem)
+    private IEnumerator SmoothSwapWithItem(TodoBaseItem targetItem)
     {
         isSwapping = true;
         RectTransform targetRect = targetItem.rectTransform;

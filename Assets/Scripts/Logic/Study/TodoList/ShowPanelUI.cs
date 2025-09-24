@@ -134,7 +134,7 @@ public class ShowPanelUI : MonoBehaviour
         parent = tasksContainer;
 
         GameObject taskItem = Instantiate(todoListItemPrefab, parent);
-        BaseItem itemUI = taskItem.GetComponent<ShowItemUI>();
+        TodoBaseItem itemUI = taskItem.GetComponent<ShowItemUI>();
         itemUI.Initialize(item);
     }
 
