@@ -1,0 +1,177 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9d53e186e20094d4a87ec763b9ba801f, type: 3}
+  m_Name: ItemDataListSO
+  m_EditorClassIdentifier: 
+  itemDetailsList:
+  - itemID: 1001
+    itemname: 
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 68940171ceb877b49a4e4b25b7c57ed9, type: 3}
+    itemDescription: "\u5927\u5927\u7684\u5706\u684C"
+    itemprice: 0
+  - itemID: 1002
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 091cdf5c6a0744a498d8fa27f5474a7c, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1003
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 35ad647c80c60374d885765b6be024ed, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1004
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: b4f858c70347d844f8d4dd55ac4bcb13, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1005
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 29d710f8ef51eaa4281ba8703489169e, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1006
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 90ed998bef90c4043b401bc214afa801, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1007
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 795423843272e304e97b8e8236265b2b, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1008
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 1092f14e89f73ac4397c454f3ddefd4b, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1009
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: ec76699dc52d7a14b9ce98d12b9c3296, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1010
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: d5b7ec7ba48fa84489ad5132da58d613, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1011
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 3f5ad7b733dffd347889854fc0a8dbbe, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1012
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 9f4540c40dcdf244f99c07056d40050b, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1013
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 0c4f2bf6819c0474181f38f8c9f3b363, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1014
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: bb69c3d392ad1ae4581401ac31087529, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1015
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: b3a03b24b2ee6584fa9f554c3186c1fe, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1016
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 26f7c28f978361b4ba65266747d5260b, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1017
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: e1c7fff0b0c24944daa26cad23106559, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1018
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: dbc6458d7ae74dd479a72557784f8eb9, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1019
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 53dee0730e36ff84bb711c26e6455c10, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1020
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 31c7ddc82f3e00e40a95ecd3f6d6ce29, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1021
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 2312a7fe3cdcd4a448d62c46501d0834, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1022
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 5367287931e41bf4a950a9dd121cfe44, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1023
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: bb99adce17ac0634fa55b40931f60202, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1024
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 0bc196d4cd9eb844b84d4425c8ccf8f9, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1025
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 149862557, guid: a70eece8d5127a4459211e148ee19426, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1026
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 857181652, guid: e4d08f44648305b4d82e626a1f0ef107, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0
+  - itemID: 1027
+    itemname: "\u7535\u89C6"
+    itemtype: 1
+    itemIcon: {fileID: 21300000, guid: 33fc5fcc212c94c418fb7d9fe079ce23, type: 3}
+    itemDescription: "\u7535\u89C6"
+    itemprice: 0

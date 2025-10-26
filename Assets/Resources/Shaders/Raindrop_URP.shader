@@ -1,22 +1,23 @@
-Shader "Custom/RaindropEffectURP"
+Shader "Custom/RaindropEffectURP_Transparent"
 {
     Properties
     {
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
+        _BaseColor ("基础颜色", Color) = (0.8, 0.8, 1.0, 1.0)
         _RainSpeed ("雨滴下落速度", Range(0, 1)) = 0.5
         _DynamicDrops ("动态雨滴数量", Range(2, 5)) = 3
         _StaticDrops ("静态雨滴数量", Range(0.5, 5)) = 2
-        _BlurAmount ("背景模糊", Range(0, 1)) = 0.2
+        _RefractionIntensity ("折射强度", Range(0, 0.1)) = 0.01
+        _RaindropOpacity ("雨滴不透明度", Range(0, 1)) = 0.7
         [Space(20)]
         [KeywordEnum(Cheap, Expensive)] _NormalType ("法线类型", Float) = 0
     }
 
     SubShader
     {
-        Tags { "RenderPipeline" = "UniversalPipeline" "RenderType" = "Opaque" "Queue" = "Geometry" }
-
-        // GrabPass to capture screen for refraction effects
-        // GrabPass { "_GrabTexture" }
+        Tags { "RenderPipeline" = "UniversalPipeline" "RenderType" = "Transparent" "Queue" = "Transparent" }
+        
+        Blend SrcAlpha OneMinusSrcAlpha
+        ZWrite Off
 
         Pass
         {
@@ -28,8 +29,7 @@ Shader "Custom/RaindropEffectURP"
             #pragma shader_feature _NORMALTYPE_CHEAP _NORMALTYPE_EXPENSIVE
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/DeclareNormalsTexture.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/ShaderVariablesFunctions.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             struct Attributes
             {
@@ -41,20 +41,15 @@ Shader "Custom/RaindropEffectURP"
             {
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
-                float4 grabPos : TEXCOORD1;
             };
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
-            TEXTURE2D(_GrabTexture);
-            SAMPLER(sampler_GrabTexture);
-
             CBUFFER_START(UnityPerMaterial)
+                float4 _BaseColor;
                 float _RainSpeed;
                 float _DynamicDrops;
                 float _StaticDrops;
-                float _BlurAmount;
-                float _NormalType;
+                float _RefractionIntensity;
+                float _RaindropOpacity;
             CBUFFER_END
 
             // Utility functions from original shader
@@ -156,19 +151,11 @@ Shader "Custom/RaindropEffectURP"
                 Varyings OUT;
                 OUT.positionHCS = TransformObjectToHClip(IN.positionOS.xyz);
                 OUT.uv = IN.uv;
-                
-                // Calculate grab position for screen space effects
-                OUT.grabPos = ComputeScreenPos(OUT.positionHCS);
-                
                 return OUT;
             }
 
             half4 frag(Varyings IN) : SV_Target
             {
-                // Get screen parameters
-                float2 screenSize = _ScreenParams.xy;
-                float2 fragCoord = IN.uv * screenSize;
-                
                 // Calculate time with speed adjustment
                 float T = _Time.y * _RainSpeed;
                 
@@ -196,32 +183,28 @@ Shader "Custom/RaindropEffectURP"
                     n = float2(cx - c.x, cy - c.x);
                 #endif
                 
-                // Apply blur based on rain intensity
-                float focus = lerp(6.0 - c.y, 2.0, S(0.1, 0.2, c.x)) * _BlurAmount;
+                // Base transparency - mostly transparent except where there are raindrops
+                float baseAlpha = 0.1; // Very transparent base
                 
-                // Sample grab texture with distortion
-                // 调整GrabPass纹理坐标获取方式
-                float2 grabUV = IN.grabPos.xy / IN.grabPos.w;
-                #if UNITY_UV_STARTS_AT_TOP
-                grabUV.y = 1.0 - grabUV.y;
-                #endif
+                // Raindrops add opacity
+                float raindropAlpha = c.x * _RaindropOpacity;
                 
-                // 应用法线偏移
-                grabUV += n * 0.01;
+                // Combine base and raindrop alpha
+                float finalAlpha = saturate(baseAlpha + raindropAlpha);
                 
-                half4 grabColor = SAMPLE_TEXTURE2D(_GrabTexture, sampler_GrabTexture, grabUV);
-                // return grabColor;
+                // Color - slight tint on raindrops
+                half3 finalColor = _BaseColor.rgb;
                 
-                // Sample main texture
-                half4 mainTex = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, IN.uv);
-                // return mainTex;
+                // Add some visual enhancement to make raindrops more visible
+                finalColor = lerp(finalColor, finalColor * 1.2, c.x);
                 
-                // Blend effects
-                half4 finalColor = lerp(mainTex, grabColor, c.x * 0.5);
-                finalColor.rgb = lerp(finalColor.rgb, finalColor.rgb * 1.1, c.x);
+                // Apply refraction effect through UV distortion
+                float2 distortedUV = IN.uv + n * _RefractionIntensity;
                 
-                // return half4(c.x, c.x, c.x, 1.0);
-                return finalColor;
+                // For a more visible effect, we adjust color based on normal direction
+                finalColor += float3(n.x, n.y, 0) * 0.1 * c.x;
+                
+                return half4(finalColor, finalAlpha);
             }
             ENDHLSL
         }

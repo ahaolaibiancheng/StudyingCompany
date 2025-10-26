@@ -14,9 +14,9 @@ public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public TextMeshProUGUI deadlineTime;
     public TextMeshProUGUI totalreward;
 
-    protected Action<TodoItem> onCompleted;
-    protected Action<TodoItem, Transform> onMoved;
-    protected Action<TodoItem> onDelete;
+    // protected Action<TodoItem> onCompleted;
+    // protected Action<TodoItem, Transform> onMoved;
+    // protected Action<TodoItem> onDelete;
 
     private Transform originalParent;
     private CanvasGroup canvasGroup;
@@ -31,9 +31,8 @@ public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private bool isSwapping = false;
     private Coroutine swapCoroutine = null;
 
-    protected void Awake()
+    protected virtual void Awake()
     {
-        completionToggle.onValueChanged.AddListener(OnToggleChanged);
         canvasGroup = GetComponent<CanvasGroup>();
         if (canvasGroup == null)
             canvasGroup = gameObject.AddComponent<CanvasGroup>();
@@ -50,10 +49,12 @@ public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         deadlineTime.gameObject.SetActive(type != TodoBaseItemType.Daily);
         totalreward.text = item.rewardTotal.ToString();
 
+        completionToggle.onValueChanged.AddListener(OnToggleChanged);
+
         transform.SetSiblingIndex(item.sortOrder);
     }
 
-    private void OnToggleChanged(bool isCompleted)
+    protected virtual void OnToggleChanged(bool isCompleted)
     {
         // 处理Toggle状态变化
     }

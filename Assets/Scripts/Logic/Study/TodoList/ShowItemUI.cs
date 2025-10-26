@@ -14,7 +14,7 @@ public class ShowItemUI : TodoBaseItem
     // private bool isOverDeleteArea = false;
     private RectTransform deleteAreaRect;
 
-    private void OnToggleChanged(bool isCompleted)
+    protected override void OnToggleChanged(bool isCompleted)
     {
         todoBaseItem.isCompleted = isCompleted;
         TodoListEventHandler.CallTodoItemCompleted(todoBaseItem);

@@ -221,7 +221,9 @@ public class SpriteInteractiveController : MonoBehaviour
     {
         if (targetSprite != null)
         {
-            Destroy(targetSprite);
+            // 删除Sprite的父节点
+            Destroy(targetSprite.transform.parent.gameObject);
+            // Destroy(targetSprite);
             // 可选：禁用控制器或显示消息
             Debug.Log("Sprite deleted");
         }

@@ -3,40 +3,41 @@ using UnityEngine;
 public class GlassEffectController : MonoBehaviour
 {
     [SerializeField] private Material glassMaterial;
-    [SerializeField] private Texture2D rainDropTexture; // 雨滴纹理
-    [SerializeField] private Texture2D distortionTexture; // 扭曲纹理
-    [SerializeField] private float[] rainIntensityValues = new float[] { 0f, 0.3f, 0.6f, 1f }; // 4个强度级别
-    [SerializeField] private float[] dropSpeedValues = new float[] { 0f, 0.5f, 1f, 2f }; // 雨滴速度
-    [SerializeField] private float[] dropSizeValues = new float[] { 1f, 1.2f, 1.5f, 2f }; // 雨滴大小
-    [SerializeField] private float[] distortionValues = new float[] { 0f, 0.01f, 0.02f, 0.03f }; // 扭曲强度
-    
-    private void Start()
+    [SerializeField] private float[] dropSpeedValues = new float[] { 0f, 0.1f, 0.2f, 0.4f }; // 雨滴速度
+    [SerializeField] private float[] dynamicSizeValues = new float[] { 0f, 2f, 3f, 5f }; // 雨滴大小
+    [SerializeField] private float[] staticSizeValues = new float[] { 0f, 0.5f, 2f, 5f }; // 扭曲强度
+    public RainIntensity currentRainIntensity = RainIntensity.None;
+
+    private void Awake()
     {
-        if (glassMaterial == null)
-        {
-            glassMaterial = GetComponent<Renderer>().material;
-        }
-        
-        // 设置初始纹理
-        if (rainDropTexture != null)
-            glassMaterial.SetTexture("_RainDropTex", rainDropTexture);
-        if (distortionTexture != null)
-            glassMaterial.SetTexture("_DistortionTex", distortionTexture);
+        glassMaterial = GetComponent<Renderer>().material;
     }
-    
-    public void SetRainIntensity(int intensity)
+
+    public void SetRainIntensity(RainIntensity intensity)
     {
-        if (glassMaterial == null || intensity < 0 || intensity >= rainIntensityValues.Length)
+        if (glassMaterial == null ||
+            (int)intensity > dropSpeedValues.Length - 1 ||
+            (int)intensity > dynamicSizeValues.Length - 1 ||
+            (int)intensity > staticSizeValues.Length - 1)
             return;
-            
+
         // 设置雨量强度参数
-        glassMaterial.SetFloat("_RainIntensity", rainIntensityValues[intensity]);
-        glassMaterial.SetFloat("_DropSpeed", dropSpeedValues[intensity]);
-        glassMaterial.SetFloat("_DropSize", dropSizeValues[intensity]);
-        glassMaterial.SetFloat("_DistortionAmount", distortionValues[intensity]);
-        
-        // 设置湿润度 - 根据强度调整
-        float wetness = intensity * 0.25f;
-        glassMaterial.SetFloat("_Wetness", wetness);
+        glassMaterial.SetFloat("_RainSpeed", dropSpeedValues[(int)intensity]);
+        glassMaterial.SetFloat("_DynamicDrops", dynamicSizeValues[(int)intensity]);
+        glassMaterial.SetFloat("_StaticDrops", staticSizeValues[(int)intensity]);
     }
+
+    public void UpdateGlassEffects(RainIntensity intensity)
+    {
+        currentRainIntensity = intensity;
+        SetRainIntensity(currentRainIntensity);
+    }
+}
+
+public enum RainIntensity
+{
+    None,
+    Light,
+    Medium,
+    Heavy
 }
