@@ -65,7 +65,7 @@ public class PetController : MonoBehaviour
         SetPetState(PetState.Reminding);
 
         UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
-        (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReminderMessage("该休息了");  
+        (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReminderMessage("该休息了");
         // 等待5秒后关闭面板
         yield return new WaitForSeconds(5);
         UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
@@ -78,7 +78,7 @@ public class PetController : MonoBehaviour
         SetPetState(PetState.Reminding);
 
         UIManager.Instance.OpenPanel(UIConst.ReminderPanel);
-        (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReminderMessage("该学习了");  
+        (UIManager.Instance.GetPanel(UIConst.ReminderPanel) as ReminderPanel)?.ShowReminderMessage("该学习了");
         // 等待5秒后关闭面板
         yield return new WaitForSeconds(5);
         UIManager.Instance.ClosePanel(UIConst.ReminderPanel);
@@ -146,13 +146,13 @@ public class PetController : MonoBehaviour
     public void OnRemindingCompleted()
     {
         if (animator.GetInteger("petState") != CAT_REMIND_PARAM) return;
-        if (TomatoController.Instance?.IsFocusPhase() == true)
-        {
-            SetPetState(PetState.Reading);
-        }
-        else
-        {
-            SetPetState(PetState.Idle);
-        }
+        // if (TomatoController.Instance?.IsFocusPhase() == true)
+        // {
+        //     SetPetState(PetState.Reading);
+        // }
+        // else
+        // {
+        //     SetPetState(PetState.Idle);
+        // }
     }
 }

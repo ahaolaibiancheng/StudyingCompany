@@ -42,6 +42,20 @@ public class TodoListController : Singleton<TodoListController>
         SaveTodoList();
     }
 
+    public void RemoveTodoItem(TodoItem item)
+    {
+        if (todoListDataSO == null || item == null)
+        {
+            return;
+        }
+
+        bool removed = todoListDataSO.RemoveTodoItem(item);
+        if (removed)
+        {
+            SaveTodoList();
+        }
+    }
+
     /// <summary>
     /// 当任务完成时，移动到对应的类型列表
     /// </summary>

@@ -1,4 +1,4 @@
-Shader "Custom/RaindropURP"
+Shader "Custom/Raindrop2DURP"
 {
     Properties
     {
@@ -21,15 +21,16 @@ Shader "Custom/RaindropURP"
 
         Pass
         {
-            Tags { "LightMode" = "UniversalForward" }
+            // 修改为适合2D渲染的LightMode
+            Tags { "LightMode" = "Universal2D" }
 
             HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma shader_feature _NORMALTYPE_CHEAP _NORMALTYPE_EXPENSIVE
 
+            // 使用更适合2D项目的包含文件
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
 
             struct Attributes
             {

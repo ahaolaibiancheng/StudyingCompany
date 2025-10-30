@@ -1,379 +1,153 @@
-using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 using TMPro;
-using System;
 
-public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] protected TodoItem todoBaseItem;
     [SerializeField] protected TodoBaseItemType type;
-    public Toggle completionToggle;
-    public TextMeshProUGUI contentText;
+    public Button taskDoingBtn;
+    public Button taskCompletedBtn;
+    public Button deleteButton;
+    public TMP_InputField contentText;
+    // 以下暂未使用
     public TextMeshProUGUI deadlineTime;
     public TextMeshProUGUI totalreward;
 
-    // protected Action<TodoItem> onCompleted;
-    // protected Action<TodoItem, Transform> onMoved;
-    // protected Action<TodoItem> onDelete;
-
-    private Transform originalParent;
-    private CanvasGroup canvasGroup;
-    private RectTransform rectTransform;
-    private Vector2 originalPosition;
-    private int originalSiblingIndex;
-    private Vector2 dragOffset;
-    private bool isDragging = false;
-    private TodoBaseItem targetSwapItem = null;
-
-    // 交换动画控制
-    private bool isSwapping = false;
-    private Coroutine swapCoroutine = null;
+    public TodoItem Data => todoBaseItem;
 
     protected virtual void Awake()
     {
-        canvasGroup = GetComponent<CanvasGroup>();
-        if (canvasGroup == null)
-            canvasGroup = gameObject.AddComponent<CanvasGroup>();
-        rectTransform = GetComponent<RectTransform>();
+        RegisterButtonListeners();
     }
 
     public void Initialize(TodoItem item)
     {
         todoBaseItem = item;
-        completionToggle.isOn = (type == TodoBaseItemType.History) ? true : false;
-        completionToggle.interactable = (type == TodoBaseItemType.History) ? false : true;
         contentText.text = item.keywords;
-        deadlineTime.text = ((type == TodoBaseItemType.History) ? item.completionTime : item.deadlineTime).ToString("yyyy/MM/dd");
-        deadlineTime.gameObject.SetActive(type != TodoBaseItemType.Daily);
-        totalreward.text = item.rewardTotal.ToString();
+        // deadlineTime.text = ((type == TodoBaseItemType.History) ? item.completionTime : item.deadlineTime).ToString("yyyy/MM/dd");
+        // deadlineTime.gameObject.SetActive(type != TodoBaseItemType.Daily);
+        // totalreward.text = item.rewardTotal.ToString();
 
-        completionToggle.onValueChanged.AddListener(OnToggleChanged);
-
+        RegisterButtonListeners();
+        ApplyCompletionVisual(item.isCompleted);
         transform.SetSiblingIndex(item.sortOrder);
     }
 
     protected virtual void OnToggleChanged(bool isCompleted)
     {
-        // 处理Toggle状态变化
+        // Override in derived classes to handle completion state changes.
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        TodoListController.Instance.detailPanel.SetupDetail(todoBaseItem);
-        TodoListController.Instance.detailPanel.gameObject.SetActive(true);
+        //     TodoListController.Instance.detailPanel.SetupDetail(todoBaseItem);
+        //     TodoListController.Instance.detailPanel.gameObject.SetActive(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        TodoListController.Instance.detailPanel.gameObject.SetActive(false);
+        // TodoListController.Instance.detailPanel.gameObject.SetActive(false);
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    private void RegisterButtonListeners()
     {
-        // 记录原始位置和父对象
-        originalParent = transform.parent;  // Content
-        originalPosition = rectTransform.anchoredPosition;
-        originalSiblingIndex = transform.GetSiblingIndex();
-
-        // 讆算鼠标相对于项目中心的偏移
-        Vector2 localPointerPosition;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            rectTransform, eventData.position, eventData.pressEventCamera, out localPointerPosition))
+        if (taskDoingBtn != null)
         {
-            dragOffset = localPointerPosition;
+            taskDoingBtn.onClick.RemoveListener(OnDoingButtonClicked);
+            taskDoingBtn.onClick.AddListener(OnDoingButtonClicked);
         }
 
-        // 保持在原始父级下，但置于顶层
-        transform.SetAsLastSibling();
-
-        // 启用拖动效果 - 保持完全可见
-        canvasGroup.alpha = 1.0f;  // 确保完全不透明
-        canvasGroup.blocksRaycasts = false;
-
-        // 添加视觉反馈
-        transform.localScale = Vector3.one * 1.05f;
-
-        // 确保sortingOrder为最高
-        Canvas canvas = GetComponentInParent<Canvas>();
-        if (canvas != null)
+        if (taskCompletedBtn != null)
         {
-            Canvas rootCanvas = canvas.rootCanvas;
-            canvas.overrideSorting = true;
-            canvas.sortingOrder = 1000; // 设置为高优先级
+            taskCompletedBtn.onClick.RemoveListener(OnCompletedButtonClicked);
+            taskCompletedBtn.onClick.AddListener(OnCompletedButtonClicked);
         }
 
-        isDragging = true;
-        targetSwapItem = null;
-
-        // 停止任何正在进行的交换动画
-        if (swapCoroutine != null)
+        if (deleteButton != null)
         {
-            StopCoroutine(swapCoroutine);
-            swapCoroutine = null;
+            deleteButton.onClick.RemoveListener(OnDeleteButtonClicked);
+            deleteButton.onClick.AddListener(OnDeleteButtonClicked);
         }
-        isSwapping = false;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    private void OnDoingButtonClicked()
     {
-        // 更新位置
-        Vector2 localPointerPosition;
-        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-            originalParent as RectTransform, eventData.position,
-            eventData.pressEventCamera, out localPointerPosition))
-        {
-            rectTransform.anchoredPosition = localPointerPosition - dragOffset;
-        }
-
-        // 检查并处理项目交换
-        CheckForItemSwap(eventData);
+        SetCompletionState(true);
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    private void OnCompletedButtonClicked()
     {
-        // 恢复Canvas排序
-        Canvas canvas = GetComponentInParent<Canvas>();
-        if (canvas != null)
-        {
-            canvas.overrideSorting = false;
-            canvas.sortingOrder = 0;
-        }
-
-        // 恢复正常大小
-        transform.localScale = Vector3.one;
-
-        // 恢复拖动效果
-        canvasGroup.alpha = 1f;
-        canvasGroup.blocksRaycasts = true;
-
-        // 检查是否落在原容器内
-        bool isDroppedInOriginalContainer = IsDroppedInOriginalContainer(eventData);
-
-        if (isDroppedInOriginalContainer)
-        {
-            // 更新排序顺序
-            UpdateSortOrder();
-        }
-        else
-        {
-            // 返回原位置
-            ReturnToOriginalPosition();
-        }
-
-        isDragging = false;
-        targetSwapItem = null;
-
-        // 停止任何正在进行的交换动画
-        if (swapCoroutine != null)
-        {
-            StopCoroutine(swapCoroutine);
-            swapCoroutine = null;
-        }
-        isSwapping = false;
+        SetCompletionState(false);
     }
 
-    private bool IsDroppedInOriginalContainer(PointerEventData eventData)
+    private void SetCompletionState(bool isCompleted)
     {
-        // 检查所有悬停对象，寻找原容器
-        foreach (var hoveredObject in eventData.hovered)
+        if (todoBaseItem == null)
         {
-            // 如果悬停对象是原容器或其子对象
-            if (hoveredObject.transform == originalParent || hoveredObject.transform.IsChildOf(originalParent))
+            return;
+        }
+
+        if (todoBaseItem.isCompleted == isCompleted)
+        {
+            ApplyCompletionVisual(isCompleted);
+            return;
+        }
+
+        todoBaseItem.isCompleted = isCompleted;
+        ApplyCompletionVisual(isCompleted);
+        OnToggleChanged(isCompleted);
+    }
+
+    private void OnDeleteButtonClicked()
+    {
+        DeleteCurrentItem();
+    }
+
+    private void DeleteCurrentItem()
+    {
+        if (todoBaseItem == null)
+        {
+            return;
+        }
+
+        TodoListController controller = TodoListController.Instance;
+        if (controller != null)
+        {
+            controller.RemoveTodoItem(todoBaseItem);
+        }
+
+        OnItemDeleted();
+        Destroy(gameObject);
+    }
+
+    private void ApplyCompletionVisual(bool isCompleted)
+    {
+        if (taskDoingBtn != null)
+        {
+            taskDoingBtn.gameObject.SetActive(!isCompleted);
+        }
+
+        if (taskCompletedBtn != null)
+        {
+            taskCompletedBtn.gameObject.SetActive(isCompleted);
+        }
+
+        if (contentText != null)
+        {
+            if (isCompleted)
             {
-                return true;
+                contentText.textComponent.fontStyle |= FontStyles.Strikethrough;
+            }
+            else
+            {
+                contentText.textComponent.fontStyle &= ~FontStyles.Strikethrough;
             }
         }
-        return false;
     }
 
-    private void CheckForItemSwap(PointerEventData eventData)
+    protected virtual void OnItemDeleted()
     {
-        // 如果正在交换动画中，不处理新的交换
-        if (isSwapping) return;
-
-        if (originalParent == null) return;
-
-        TodoBaseItem newTargetSwapItem = null;
-        Vector2 mousePosition = eventData.position;
-
-        // 遍历同一容器中的所有项目
-        for (int i = 0; i < originalParent.childCount; i++)
-        {
-            Transform child = originalParent.GetChild(i);
-            if (child == transform) continue; // 跳过自己
-
-            TodoBaseItem otherItem = child.GetComponent<TodoBaseItem>();
-            if (otherItem != null)
-            {
-                RectTransform otherRect = otherItem.GetComponent<RectTransform>();
-                if (otherRect != null)
-                {
-                    // 检查鼠标是否在该项目范围内
-                    if (RectTransformUtility.RectangleContainsScreenPoint(otherRect, mousePosition, eventData.pressEventCamera))
-                    {
-                        newTargetSwapItem = otherItem;
-                        break;
-                    }
-                }
-            }
-        }
-
-        // 如果交换目标发生变化
-        if (newTargetSwapItem != targetSwapItem)
-        {
-            // 停止之前的交换动画
-            if (swapCoroutine != null)
-            {
-                StopCoroutine(swapCoroutine);
-                swapCoroutine = null;
-            }
-
-            // 执行交换动画
-            if (newTargetSwapItem != null)
-            {
-                swapCoroutine = StartCoroutine(SmoothSwapWithItem(newTargetSwapItem));
-            }
-
-            targetSwapItem = newTargetSwapItem;
-        }
-    }
-
-    /// <summary>
-    /// 快速交换：duration = 0.1f (100ms)
-    /// 标准速度：duration = 0.2f (200ms)
-    /// 慢速交换：duration = 0.3f (300ms)
-    /// 超慢速：duration = 0.5f (500ms)
-
-    /// 线性插值（匀速）
-    /// t = elapsedTime / duration;
-    /// 平滑插值（慢入慢出）
-    /// t = Mathf.SmoothStep(0f, 1f, t);
-    /// 弹性插值
-    /// t = Mathf.SmoothDamp(0f, 1f, ref velocity, duration);
-    /// </summary>
-    /// <param name="targetItem"></param>
-    /// <returns></returns>
-    // private IEnumerator SmoothSwapWithItem(TodoBaseItem targetItem)
-    // {
-    //     isSwapping = true;
-
-    //     // 获取两个项目的RectTransform
-    //     RectTransform targetRect = targetItem.rectTransform;
-
-    //     // 记录原始位置
-    //     Vector2 originalPos = rectTransform.anchoredPosition;
-    //     Vector2 targetPos = targetRect.anchoredPosition;
-
-    //     // 计算目标位置（交换后的位置）
-    //     // 注意：由于是交换位置，所以目标是对方的原始位置
-    //     Vector2 newThisPosition = targetPos;
-    //     Vector2 newTargetPosition = originalPos;
-
-    //     // 动画参数
-    //     float duration = 0.2f; // 动画持续时间（可根据需要调整）
-    //     float elapsedTime = 0f;
-
-    //     // 执行平滑移动动画
-    //     while (elapsedTime < duration)
-    //     {
-    //         float t = elapsedTime / duration;
-    //         // 使用平滑插值
-    //         t = Mathf.SmoothStep(0f, 1f, t);
-
-    //         // 更新两个项目的位置
-    //         rectTransform.anchoredPosition = Vector2.Lerp(originalPos, newThisPosition, t);
-    //         targetRect.anchoredPosition = Vector2.Lerp(targetPos, newTargetPosition, t);
-
-    //         elapsedTime += Time.deltaTime;
-    //         yield return null;
-    //     }
-
-    //     // 确保最终位置准确
-    //     rectTransform.anchoredPosition = newThisPosition;
-    //     targetRect.anchoredPosition = newTargetPosition;
-
-    //     // 交换在层级中的位置
-    //     int currentIndex = transform.GetSiblingIndex();
-    //     int targetIndex = targetItem.transform.GetSiblingIndex();
-    //     transform.SetSiblingIndex(targetIndex);
-    //     targetItem.transform.SetSiblingIndex(currentIndex);
-
-    //     // 重置位置（因为SetSiblingIndex可能会影响位置）
-    //     rectTransform.anchoredPosition = newThisPosition;
-    //     targetRect.anchoredPosition = newTargetPosition;
-
-    //     isSwapping = false;
-    //     swapCoroutine = null;
-    // }
-
-    private void UpdateSortOrder()
-    {
-        // 更新当前项的排序顺序
-        if (todoBaseItem != null)
-        {
-            todoBaseItem.sortOrder = transform.GetSiblingIndex();
-        }
-
-        // 更新同容器中所有项的排序顺序
-        if (originalParent != null)
-        {
-            for (int i = 0; i < originalParent.childCount; i++)
-            {
-                TodoBaseItem item = originalParent.GetChild(i).GetComponent<TodoBaseItem>();
-                if (item != null && item.todoBaseItem != null)
-                {
-                    item.todoBaseItem.sortOrder = i;
-                }
-            }
-        }
-
-        // 保存数据
-        TodoListController.Instance.SaveTodoList();
-    }
-
-    private void ReturnToOriginalPosition()
-    {
-        transform.SetSiblingIndex(originalSiblingIndex);
-    }
-
-    private IEnumerator SmoothSwapWithItem(TodoBaseItem targetItem)
-    {
-        isSwapping = true;
-        RectTransform targetRect = targetItem.rectTransform;
-
-        Vector2 originalPos = rectTransform.anchoredPosition;
-        Vector2 targetPos = targetRect.anchoredPosition;
-        Vector2 newThisPosition = targetPos;
-        Vector2 newTargetPosition = originalPos;
-
-        float duration = 0.25f;
-        float elapsedTime = 0f;
-
-        while (elapsedTime < duration)
-        {
-            float t = elapsedTime / duration;
-            // 添加弹性效果
-            t = Mathf.Sin(t * Mathf.PI * 0.5f);
-
-            rectTransform.anchoredPosition = Vector2.Lerp(originalPos, newThisPosition, t);
-            targetRect.anchoredPosition = Vector2.Lerp(targetPos, newTargetPosition, t);
-
-            elapsedTime += Time.deltaTime;
-            yield return null;
-        }
-
-        rectTransform.anchoredPosition = newThisPosition;
-        targetRect.anchoredPosition = newTargetPosition;
-
-        // 交换层级位置
-        int currentIndex = transform.GetSiblingIndex();
-        int targetIndex = targetItem.transform.GetSiblingIndex();
-        transform.SetSiblingIndex(targetIndex);
-        targetItem.transform.SetSiblingIndex(currentIndex);
-
-        isSwapping = false;
-        swapCoroutine = null;
     }
 }

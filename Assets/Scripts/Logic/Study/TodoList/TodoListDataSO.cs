@@ -20,6 +20,51 @@ public class TodoListDataSO : ScriptableObject
     public List<TodoItem> personalGrowthList;
     public List<TodoItem> financialManagementList;
 
+    private readonly List<List<TodoItem>> allLists = new List<List<TodoItem>>();
+
+    private void OnEnable()
+    {
+        InitializeListsRegistry();
+    }
+
+    private void OnValidate()
+    {
+        InitializeListsRegistry();
+    }
+
+    private void InitializeListsRegistry()
+    {
+        allLists.Clear();
+        EnsureListInitialized();
+        allLists.AddRange(new[]
+        {
+            importantUrgent,
+            notImportantUrgent,
+            importantNotUrgent,
+            notImportantNotUrgent,
+            workStudyList,
+            personalHealthList,
+            familyLifeList,
+            socialRelationsList,
+            personalGrowthList,
+            financialManagementList
+        });
+    }
+
+    private void EnsureListInitialized()
+    {
+        if (importantUrgent == null) importantUrgent = new List<TodoItem>();
+        if (notImportantUrgent == null) notImportantUrgent = new List<TodoItem>();
+        if (importantNotUrgent == null) importantNotUrgent = new List<TodoItem>();
+        if (notImportantNotUrgent == null) notImportantNotUrgent = new List<TodoItem>();
+        if (workStudyList == null) workStudyList = new List<TodoItem>();
+        if (personalHealthList == null) personalHealthList = new List<TodoItem>();
+        if (familyLifeList == null) familyLifeList = new List<TodoItem>();
+        if (socialRelationsList == null) socialRelationsList = new List<TodoItem>();
+        if (personalGrowthList == null) personalGrowthList = new List<TodoItem>();
+        if (financialManagementList == null) financialManagementList = new List<TodoItem>();
+    }
+
     public void AddTodoItem(TodoItem item)
     {
         if (item.isImportant && item.isUrgent)
@@ -106,6 +151,45 @@ public class TodoListDataSO : ScriptableObject
             return null;
         }
 
+    }
+
+    public bool RemoveTodoItem(TodoItem item)
+    {
+        if (item == null)
+        {
+            return false;
+        }
+
+        bool removed = false;
+        string targetGuid = item.guid;
+        bool hasGuid = !string.IsNullOrEmpty(targetGuid);
+
+        foreach (List<TodoItem> list in allLists)
+        {
+            if (list == null || list.Count == 0)
+            {
+                continue;
+            }
+
+            int index = list.FindIndex(existing =>
+                hasGuid ? existing.guid == targetGuid : ReferenceEquals(existing, item));
+            if (index >= 0)
+            {
+                list.RemoveAt(index);
+                NormalizeSortOrder(list);
+                removed = true;
+            }
+        }
+
+        return removed;
+    }
+
+    private void NormalizeSortOrder(List<TodoItem> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            list[i].sortOrder = i;
+        }
     }
 }
 

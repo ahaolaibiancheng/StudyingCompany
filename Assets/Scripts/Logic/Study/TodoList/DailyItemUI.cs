@@ -26,9 +26,12 @@ public class DailyItemUI : TodoBaseItem
 
     protected override void OnToggleChanged(bool isCompleted)
     {
-        // isCompleted必为true
-        vfxControl.DailyItemCompleted(this.transform.position, this.transform.position);
+        if (!isCompleted)
+        {
+            return;
+        }
+
+        vfxControl.DailyItemCompleted(transform.position, transform.position);
         TodoListEventHandler.CallDailyItemCompleted(todoBaseItem);
-        // Destroy(gameObject);
     }
 }

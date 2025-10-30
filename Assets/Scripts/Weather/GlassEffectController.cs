@@ -13,6 +13,11 @@ public class GlassEffectController : MonoBehaviour
         glassMaterial = GetComponent<Renderer>().material;
     }
 
+    private void Start()
+    {
+        SetRainIntensity(currentRainIntensity);
+    }
+
     public void SetRainIntensity(RainIntensity intensity)
     {
         if (glassMaterial == null ||

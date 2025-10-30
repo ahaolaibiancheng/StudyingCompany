@@ -30,7 +30,7 @@ public class VFXControl : MonoBehaviour
         trailPath.GetComponent<CinemachineSmoothPath>().m_Waypoints[0].position = startPos;
         // trailPath.GetComponent<CinemachineSmoothPath>().m_Waypoints[4].position = endPos;
 
-        trainControl.SetTrainMoving(true);
+        // trainControl.SetTrainMoving(true);
     }
 
     public void LightRainDrop()

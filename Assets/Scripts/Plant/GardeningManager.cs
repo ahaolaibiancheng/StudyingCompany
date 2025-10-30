@@ -19,7 +19,6 @@ public class GardeningManager : MonoBehaviour
     public PlantPanelUI plantPanel;
     public WarnPanelUI warnPanel;
 
-
     private Queue<PlantPot> wateringQueue = new();
     private Queue<PlantPot> plantingQueue = new();
 
