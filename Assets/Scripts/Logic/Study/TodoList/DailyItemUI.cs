@@ -31,7 +31,8 @@ public class DailyItemUI : TodoBaseItem
             return;
         }
 
-        vfxControl.DailyItemCompleted(transform.position, transform.position);
+        // vfxControl.DailyItemCompleted(transform.position, transform.position);
+        // Item破碎的动画
         TodoListEventHandler.CallDailyItemCompleted(todoBaseItem);
     }
 }

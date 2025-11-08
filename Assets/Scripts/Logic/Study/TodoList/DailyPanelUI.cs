@@ -15,7 +15,6 @@ public class DailyPanelUI : MonoBehaviour
     public Button notImportantUrgentButton;
     public Button importantNotUrgentButton;
     public Button notImportantNotUrgentButton;
-    [Header("Actions")]
     public Button addButton;
     [Header("Daily Item Prefab")]
     public GameObject todoListItemPrefab;
@@ -40,10 +39,7 @@ public class DailyPanelUI : MonoBehaviour
         RegisterCategoryButton(notImportantUrgentButton, TodoCategory.NotImportantUrgent);
         RegisterCategoryButton(importantNotUrgentButton, TodoCategory.ImportantNotUrgent);
         RegisterCategoryButton(notImportantNotUrgentButton, TodoCategory.NotImportantNotUrgent);
-        if (addButton != null)
-        {
-            addButton.onClick.AddListener(OnAddButtonClicked);
-        }
+        addButton?.onClick.AddListener(OnAddButtonClicked);
     }
 
     void OnEnable()
@@ -67,10 +63,7 @@ public class DailyPanelUI : MonoBehaviour
             }
         }
         buttonListeners.Clear();
-        if (addButton != null)
-        {
-            addButton.onClick.RemoveListener(OnAddButtonClicked);
-        }
+        addButton?.onClick.RemoveListener(OnAddButtonClicked);
     }
 
     private void Start()
@@ -104,7 +97,7 @@ public class DailyPanelUI : MonoBehaviour
                 titleText.text = "今日待办（紧急非重要）";
                 break;
             case TodoCategory.NotImportantNotUrgent:
-                titleText.text = "清单（非紧急非重要）";
+                titleText.text = "今日待办（非紧急非重要）";
                 break;
             default:
                 titleText.text = "今日待办（紧急重要）";
@@ -227,15 +220,11 @@ public class DailyPanelUI : MonoBehaviour
         List<TodoItem> currentList = GetCategoryItems(category);
         int nextSortOrder = currentList != null ? currentList.Count : 0;
 
-        bool isImportant = category == TodoCategory.ImportantUrgent || category == TodoCategory.ImportantNotUrgent;
-        bool isUrgent = category == TodoCategory.ImportantUrgent || category == TodoCategory.NotImportantUrgent;
-
         TodoItem item = new TodoItem
         {
             guid = Guid.NewGuid().ToString(),
             keywords = "新日常任务",
-            isImportant = isImportant,
-            isUrgent = isUrgent,
+            taskType = (TaskType)currentCategory,
             isCompleted = false,
             type = "工作/学业",
             rewardDaily = 1,

@@ -13,29 +13,27 @@ MonoBehaviour:
   m_Name: TodoListDataSO
   m_EditorClassIdentifier: 
   importantUrgent:
-  - guid: 770b9508-0fd5-4623-8332-2d09640026b9
-    keywords: aaaaa
-    isImportant: 1
-    isUrgent: 1
+  - guid: c38e6cbb-bc62-48fa-92e3-7a65bbcda43f
+    keywords: "\u65B0\u65E5\u5E38\u4EFB\u52A1"
+    taskType: 0
     isCompleted: 0
     type: "\u5DE5\u4F5C/\u5B66\u4E1A"
     rewardDaily: 1
-    rewardTotal: 1
-    completedTimes: 1
+    rewardTotal: 0
+    completedTimes: 0
     period: 01010101010101
-    description: aaaaa
+    description: 
     sortOrder: 0
-    creationTimeString: 2025-09-22 11:48:37
-    deadlineTimeString: 2025-01-01 00:00:00
+    creationTimeString: 2025-11-02 18:23:53
+    deadlineTimeString: 2025-11-02 18:23:53
     completionTimeString: 9999-12-31 23:59:59
   notImportantUrgent: []
   importantNotUrgent: []
   notImportantNotUrgent: []
   workStudyList:
-  - guid: cb42d27c-527f-4b68-8915-399ef1ebce89
+  - guid: 98b6e599-448e-4a55-a580-38714151f903
     keywords: 2222
-    isImportant: 1
-    isUrgent: 1
+    taskType: 0
     isCompleted: 1
     type: "\u5DE5\u4F5C/\u5B66\u4E1A"
     rewardDaily: 1
@@ -43,29 +41,13 @@ MonoBehaviour:
     completedTimes: 0
     period: 01000000010101
     description: 333333
-    sortOrder: 0
-    creationTimeString: 
-    deadlineTimeString: 
-    completionTimeString: 2025-09-21 23:01:06
-  - guid: 86297aa3-e9ab-4e40-999b-75fda9f86f13
-    keywords: 111
-    isImportant: 1
-    isUrgent: 1
-    isCompleted: 1
-    type: "\u5DE5\u4F5C/\u5B66\u4E1A"
-    rewardDaily: 1
-    rewardTotal: 0
-    completedTimes: 0
-    period: 01010101010101
-    description: 22222
     sortOrder: 1
     creationTimeString: 
     deadlineTimeString: 
-    completionTimeString: 
-  - guid: 98b6e599-448e-4a55-a580-38714151f903
+    completionTimeString: 2025-09-21 23:30:32
+  - guid: cb42d27c-527f-4b68-8915-399ef1ebce89
     keywords: 2222
-    isImportant: 1
-    isUrgent: 1
+    taskType: 0
     isCompleted: 1
     type: "\u5DE5\u4F5C/\u5B66\u4E1A"
     rewardDaily: 1
@@ -76,7 +58,21 @@ MonoBehaviour:
     sortOrder: 2
     creationTimeString: 
     deadlineTimeString: 
-    completionTimeString: 2025-09-21 23:30:32
+    completionTimeString: 2025-09-21 23:01:06
+  - guid: 86297aa3-e9ab-4e40-999b-75fda9f86f13
+    keywords: 111
+    taskType: 0
+    isCompleted: 1
+    type: "\u5DE5\u4F5C/\u5B66\u4E1A"
+    rewardDaily: 1
+    rewardTotal: 0
+    completedTimes: 0
+    period: 01010101010101
+    description: 22222
+    sortOrder: 0
+    creationTimeString: 
+    deadlineTimeString: 
+    completionTimeString: 
   personalHealthList: []
   familyLifeList: []
   socialRelationsList: []

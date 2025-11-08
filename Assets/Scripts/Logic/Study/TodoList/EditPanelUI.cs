@@ -117,8 +117,8 @@ public class EditPanelUI : MonoBehaviour
         {
             guid = Guid.NewGuid().ToString(),
             keywords = keywordInput.text,
-            isImportant = importantToggle.isOn,
-            isUrgent = urgentToggle.isOn,
+            // isImportant = importantToggle.isOn,
+            // isUrgent = urgentToggle.isOn,
             isCompleted = false,
             type = typeDd.options[typeDd.value].text,
             rewardDaily = GetRewardDaily(),

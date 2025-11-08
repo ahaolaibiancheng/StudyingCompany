@@ -53,23 +53,9 @@ public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     private void RegisterButtonListeners()
     {
-        if (taskDoingBtn != null)
-        {
-            taskDoingBtn.onClick.RemoveListener(OnDoingButtonClicked);
-            taskDoingBtn.onClick.AddListener(OnDoingButtonClicked);
-        }
-
-        if (taskCompletedBtn != null)
-        {
-            taskCompletedBtn.onClick.RemoveListener(OnCompletedButtonClicked);
-            taskCompletedBtn.onClick.AddListener(OnCompletedButtonClicked);
-        }
-
-        if (deleteButton != null)
-        {
-            deleteButton.onClick.RemoveListener(OnDeleteButtonClicked);
-            deleteButton.onClick.AddListener(OnDeleteButtonClicked);
-        }
+        taskDoingBtn?.onClick.AddListener(OnDoingButtonClicked);
+        taskCompletedBtn?.onClick.AddListener(OnCompletedButtonClicked);
+        deleteButton?.onClick.AddListener(OnDeleteButtonClicked);
     }
 
     private void OnDoingButtonClicked()
@@ -84,10 +70,7 @@ public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     private void SetCompletionState(bool isCompleted)
     {
-        if (todoBaseItem == null)
-        {
-            return;
-        }
+        if (todoBaseItem == null) return;
 
         if (todoBaseItem.isCompleted == isCompleted)
         {
@@ -112,14 +95,9 @@ public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             return;
         }
 
-        TodoListController controller = TodoListController.Instance;
-        if (controller != null)
-        {
-            controller.RemoveTodoItem(todoBaseItem);
-        }
+        TodoListController.Instance.RemoveTodoItem(todoBaseItem);
 
         OnItemDeleted();
-        Destroy(gameObject);
     }
 
     private void ApplyCompletionVisual(bool isCompleted)
@@ -149,5 +127,6 @@ public class TodoBaseItem : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     protected virtual void OnItemDeleted()
     {
+        Destroy(gameObject);
     }
 }

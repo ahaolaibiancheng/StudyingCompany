@@ -42,6 +42,7 @@ public class TodoListDataSO : ScriptableObject
             notImportantUrgent,
             importantNotUrgent,
             notImportantNotUrgent,
+
             workStudyList,
             personalHealthList,
             familyLifeList,
@@ -67,11 +68,11 @@ public class TodoListDataSO : ScriptableObject
 
     public void AddTodoItem(TodoItem item)
     {
-        if (item.isImportant && item.isUrgent)
+        if (item.taskType == TaskType.ImportantUrgent)
             this.importantUrgent.Add(item);
-        else if (!item.isImportant && item.isUrgent)
+        else if (item.taskType == TaskType.NotImportantUrgent)
             this.notImportantUrgent.Add(item);
-        else if (item.isImportant && !item.isUrgent)
+        else if (item.taskType == TaskType.ImportantNotUrgent)
             this.importantNotUrgent.Add(item);
         else
             this.notImportantNotUrgent.Add(item);
@@ -120,11 +121,11 @@ public class TodoListDataSO : ScriptableObject
     public void CompleteDailyItem(TodoItem item)
     {
         TodoItem dailyItem = FindItemByGuid(item.guid);
-        if (dailyItem != null)
-        {
-            dailyItem.rewardTotal += item.rewardDaily;
-            dailyItem.completedTimes++;
-        }
+        if (dailyItem == null) return;
+
+        dailyItem.isCompleted = true;
+        dailyItem.rewardTotal += item.rewardDaily;
+        dailyItem.completedTimes++;
     }
 
     private TodoItem FindItemByGuid(string guid)
@@ -155,10 +156,7 @@ public class TodoListDataSO : ScriptableObject
 
     public bool RemoveTodoItem(TodoItem item)
     {
-        if (item == null)
-        {
-            return false;
-        }
+        if (item == null) return false;
 
         bool removed = false;
         string targetGuid = item.guid;
@@ -166,10 +164,7 @@ public class TodoListDataSO : ScriptableObject
 
         foreach (List<TodoItem> list in allLists)
         {
-            if (list == null || list.Count == 0)
-            {
-                continue;
-            }
+            if (list == null || list.Count == 0) continue;
 
             int index = list.FindIndex(existing =>
                 hasGuid ? existing.guid == targetGuid : ReferenceEquals(existing, item));
@@ -191,6 +186,7 @@ public class TodoListDataSO : ScriptableObject
             list[i].sortOrder = i;
         }
     }
+
 }
 
 [System.Serializable]
@@ -198,8 +194,7 @@ public class TodoItem
 {
     public string guid;    // 目标的唯一标识
     public string keywords;  // 简述
-    public bool isImportant;
-    public bool isUrgent;
+    public TaskType taskType;
     public bool isCompleted;
     public string type; // 任务类型：工作/学业、个人健康、家庭生活、社交人际、个人成长/兴趣、财务管理
     public int rewardDaily; // 每日奖励/奖励系数
@@ -265,4 +260,12 @@ public class TodoItem
         TimeSpan difference = completionTime - creationTime;
         return (int)Math.Ceiling(difference.TotalDays);
     }
+}
+
+public enum TaskType
+{
+    ImportantUrgent,
+    NotImportantUrgent,
+    ImportantNotUrgent,
+    NotImportantNotUrgent,
 }

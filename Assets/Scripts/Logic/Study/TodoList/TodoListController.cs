@@ -10,6 +10,8 @@ public class TodoListController : Singleton<TodoListController>
     public TodoListDataSO todoListDataSO;
     public DetailPanelUI detailPanel;
     private ScoreManager scoreManager;
+    public RewardTable rewardTable;
+    public event Action<FragmentType> OnTaskComplete;
 
     protected override void Awake()
     {
@@ -74,6 +76,12 @@ public class TodoListController : Singleton<TodoListController>
     {
         // 更新该任务的总奖励
         todoListDataSO.CompleteDailyItem(item);
+
+        // 通过概率表根据任务类型生成碎片类型
+        FragmentType fragType = rewardTable.GetRandomFragment(item.taskType);
+
+        // 广播事件
+        OnTaskComplete?.Invoke(fragType);
 
         SaveTodoList();
     }

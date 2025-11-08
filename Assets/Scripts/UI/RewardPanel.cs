@@ -10,8 +10,8 @@ public class RewardPanel : BasePanel
     public Text LevelText;
     public Transform stars;
     public Button ConfirmBtn;
-    private PackageTable packageTable;
-    private PackageLocalItem packageLocalItem;
+    private DecorateTable packageTable;
+    private DecorateLocalItem packageLocalItem;
 
     private void OnEnable()
     {
@@ -25,7 +25,7 @@ public class RewardPanel : BasePanel
 
     protected override void Awake()
     {
-        packageTable = PackageController.Instance.GetPackageTable();
+        // packageTable = DecorateController.Instance.GetDecorateTable();
     }
 
     private void Start()
@@ -40,44 +40,44 @@ public class RewardPanel : BasePanel
 
     private void OnStudyEndEvent()
     {
-        int index = UnityEngine.Random.Range(0, packageTable.packageTableItems.Count - 1);
-        PackageTableItem item = PackageController.Instance.GetPackageItemById(index);
+        // int index = UnityEngine.Random.Range(0, packageTable.packageTableItems.Count - 1);
+        // PackageTableItem item = PackageController.Instance.GetPackageItemById(index);
 
-        Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(item.imagePath);
-        LevelText.GetComponent<Text>().text = "Lv." + item.star.ToString();
+        // Icon.GetComponent<Image>().sprite = Resources.Load<Sprite>(item.imagePath);
+        // LevelText.GetComponent<Text>().text = "Lv." + item.star.ToString();
 
-        // 刷新星级
-        for (int i = 0; i < stars.childCount; i++)
-        {
-            Transform star = stars.GetChild(i);
-            if (item.star > i)
-            {
-                star.gameObject.SetActive(true);
-            }
-            else
-            {
-                star.gameObject.SetActive(false);
-            }
-        }
+        // // 刷新星级
+        // for (int i = 0; i < stars.childCount; i++)
+        // {
+        //     Transform star = stars.GetChild(i);
+        //     if (item.star > i)
+        //     {
+        //         star.gameObject.SetActive(true);
+        //     }
+        //     else
+        //     {
+        //         star.gameObject.SetActive(false);
+        //     }
+        // }
 
-        // 存储
-        string uid = PackageController.Instance.FindUidByTableId(item.id);
-        packageLocalItem = PackageController.Instance.GetPackageLocalItemByUId(uid);
-        if (packageLocalItem != null)
-        {
-            packageLocalItem.num++;
-        }
-        else
-        {
-            packageLocalItem = new PackageLocalItem
-            {
-                uid = Guid.NewGuid().ToString(),
-                id = item.id,
-                num = 1,
-                level = item.star,
-                isNew = true
-            };
-            PackageLocalData.Instance.packageLocalItems.Add(packageLocalItem);
-        }
+        // // 存储
+        // string uid = PackageController.Instance.FindUidByTableId(item.id);
+        // packageLocalItem = PackageController.Instance.GetPackageLocalItemByUId(uid);
+        // if (packageLocalItem != null)
+        // {
+        //     packageLocalItem.num++;
+        // }
+        // else
+        // {
+        //     packageLocalItem = new PackageLocalItem
+        //     {
+        //         uid = Guid.NewGuid().ToString(),
+        //         id = item.id,
+        //         num = 1,
+        //         level = item.star,
+        //         isNew = true
+        //     };
+        //     PackageLocalData.Instance.packageLocalItems.Add(packageLocalItem);
+        // }
     }
 }

@@ -30,7 +30,7 @@ public class DetailPanelUI : MonoBehaviour
     {
         keywords.text = todoItem.keywords;
         type.text = todoItem.type;
-        importantUrgent.text = (todoItem.isUrgent ? "紧急" : "非紧急") + (todoItem.isImportant ? "重要" : "非重要");
+        // importantUrgent.text = (todoItem.isUrgent ? "紧急" : "非紧急") + (todoItem.isImportant ? "重要" : "非重要");
         creationTime.text = todoItem.creationTime.ToString("yyyy/MM/dd");
         completionTime.text = (todoItem.isCompleted) ? todoItem.completionTime.ToString("yyyy/MM/dd") : "进行";
         rewardDaily.text = todoItem.rewardDaily.ToString();
